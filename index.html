@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Faculty Timetable & Schedule Portal</title>
+  <title>School Portal Suite</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Phosphor Icons CDN -->
@@ -43,23 +43,20 @@
   <!-- ================= TOP NAVIGATION BAR ================= -->
   <header class="no-print sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
-      <!-- Brand & School Logo -->
       <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 font-bold text-xl">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md font-bold text-xl">
           <i class="ph-bold ph-graduation-cap"></i>
         </div>
         <div>
           <h1 class="text-base font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-2">
-            Faculty Portal
+            Faculty & School Suite
             <span id="role-badge" class="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
               Not Logged In
             </span>
           </h1>
           <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <span>Timetable & Schedule Management</span>
+            <span>Timetable • Attendance • Grades • DLPs</span>
             <span>•</span>
-            <!-- Cloud Connection Status Indicator -->
             <span id="cloud-sync-status" class="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Connecting to Cloud...</span>
@@ -68,7 +65,6 @@
         </div>
       </div>
 
-      <!-- Live Clock & Status Bar -->
       <div class="hidden md:flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700/80 text-xs">
         <div class="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
           <span class="relative flex h-2 w-2">
@@ -83,21 +79,15 @@
         </div>
       </div>
 
-      <!-- Action Utilities & Auth Controls -->
       <div class="flex items-center gap-2">
-        <!-- Simulator Toggle -->
         <button id="btn-toggle-sim" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center gap-1.5 transition">
           <i class="ph ph-sliders"></i>
-          <span class="hidden sm:inline">Simulate Time</span>
+          <span class="hidden sm:inline">Simulate</span>
         </button>
-
-        <!-- Credentials Helper -->
         <button id="btn-open-credentials" class="px-2.5 py-1.5 text-xs rounded-lg border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 transition flex items-center gap-1.5">
           <i class="ph-bold ph-key"></i>
           <span class="hidden sm:inline">Accounts & PINs</span>
         </button>
-
-        <!-- Profile / Sign In Container -->
         <div id="auth-nav-container"></div>
       </div>
     </div>
@@ -108,7 +98,7 @@
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 font-medium">
         <i class="ph-fill ph-megaphone-simple text-amber-600 dark:text-amber-400 text-base"></i>
-        <span id="announcement-text">School Principal Memo: All teachers please check final examination schedules.</span>
+        <span id="announcement-text">School Principal Memo: All teachers please check schedules and lesson plans.</span>
       </div>
       <button id="btn-dismiss-announcement" class="text-amber-600 dark:text-amber-400 hover:text-amber-800 text-sm p-0.5">
         <i class="ph ph-x"></i>
@@ -122,7 +112,6 @@
       <div class="flex items-center gap-2">
         <i class="ph-bold ph-clock-countdown text-emerald-400 text-base"></i>
         <span class="font-semibold">Schedule Time Machine:</span>
-        <span class="text-slate-400">Test schedules at any time/day</span>
       </div>
       <div class="flex items-center flex-wrap gap-2">
         <select id="sim-day-select" class="bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-white">
@@ -135,8 +124,8 @@
           <option value="0">Sunday</option>
         </select>
         <input type="time" id="sim-time-input" value="08:00" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-        <button id="btn-apply-sim" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-medium transition">Apply</button>
-        <button id="btn-reset-sim" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded font-medium transition">Live Real Time</button>
+        <button id="btn-apply-sim" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-medium">Apply</button>
+        <button id="btn-reset-sim" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded font-medium">Live Real Time</button>
       </div>
     </div>
   </div>
@@ -150,9 +139,9 @@
         <div class="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-emerald-500/30 mb-4">
           <i class="ph-bold ph-lock-key"></i>
         </div>
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Sign In to Your Schedule</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Sign In to Your Portal</h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">
-          Changes sync across all school devices automatically. Teachers have access strictly to their own schedule and profile.
+          Access your personalized timetable, submit DLPs, record attendance, and manage student grades.
         </p>
 
         <form id="login-form" class="space-y-4 text-left">
@@ -176,7 +165,7 @@
 
           <div id="login-error" class="hidden p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs text-center font-medium"></div>
 
-          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2">
             <span>Sign In Securely</span>
             <i class="ph-bold ph-arrow-right"></i>
           </button>
@@ -193,7 +182,7 @@
     <!-- 2. TEACHER ISOLATED DASHBOARD -->
     <section id="view-teacher-dashboard" class="hidden space-y-6">
 
-      <!-- Teacher Identity Hero Banner -->
+      <!-- Hero Banner -->
       <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="flex items-center gap-4">
@@ -207,7 +196,7 @@
             <div>
               <div class="flex items-center gap-2">
                 <h2 id="teacher-hero-name" class="text-2xl font-bold tracking-tight">Teacher Name</h2>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">Personal Access</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">Teacher Portal</span>
               </div>
               <p id="teacher-hero-dept" class="text-sm text-emerald-100/80">Department & Advisory</p>
               <div class="flex items-center gap-3 mt-2 text-xs text-emerald-200/70">
@@ -218,69 +207,105 @@
             </div>
           </div>
 
-          <!-- Quick Actions -->
           <div class="flex flex-wrap items-center gap-2">
             <button id="btn-open-edit-profile" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
               <i class="ph-bold ph-user-gear"></i>
-              <span>Edit Profile & Photo</span>
-            </button>
-            <button id="btn-open-add-period" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-white shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5">
-              <i class="ph-bold ph-plus-circle"></i>
-              <span>Add Custom Period</span>
+              <span>Profile & PIN</span>
             </button>
             <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
               <i class="ph ph-printer"></i>
-              <span class="hidden sm:inline">Print Timetable</span>
+              <span class="hidden sm:inline">Print Current View</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Live Pulse Bar -->
-      <div id="teacher-live-indicator" class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <!-- MAIN SUITE NAVIGATION TABS -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 no-print">
+        <button id="suite-tab-timetable" class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5">
+          <i class="ph-bold ph-calendar"></i>
+          <span>Schedule & Timetable</span>
+        </button>
+        <button id="suite-tab-dlp" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5">
+          <i class="ph-bold ph-notebook"></i>
+          <span>Daily Lesson Plans (DLP)</span>
+        </button>
       </div>
 
-      <!-- Tabs -->
-      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-        <div class="flex items-center gap-2">
-          <button id="tab-btn-timeline" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition">
-            Today's Timeline
+      <!-- SUBVIEW 1: TIMETABLE -->
+      <div id="subview-timetable" class="space-y-6">
+        <div id="teacher-live-indicator" class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        </div>
+
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <button id="tab-btn-timeline" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition">
+              Today's Timeline
+            </button>
+            <button id="tab-btn-weekly" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition">
+              Full Weekly Matrix (Mon - Fri)
+            </button>
+          </div>
+          <button id="btn-open-add-period" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-white shadow-md transition flex items-center gap-1">
+            <i class="ph-bold ph-plus-circle"></i>
+            <span>Add Class Period</span>
           </button>
-          <button id="tab-btn-weekly" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition">
-            Full Weekly Matrix (Mon - Fri)
-          </button>
         </div>
-        <div class="text-xs text-slate-500 dark:text-slate-400 hidden sm:flex items-center gap-1">
-          <i class="ph ph-cloud-check text-emerald-500 text-sm"></i>
-          <span>Edits are saved to Cloud Firestore in real time.</span>
+
+        <div id="teacher-view-timeline" class="space-y-3"></div>
+
+        <div id="teacher-view-weekly" class="hidden overflow-x-auto">
+          <div class="min-w-[800px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider">
+                  <th class="py-3 px-4 w-28">Time Slot</th>
+                  <th class="py-3 px-4">Monday</th>
+                  <th class="py-3 px-4">Tuesday</th>
+                  <th class="py-3 px-4">Wednesday</th>
+                  <th class="py-3 px-4">Thursday</th>
+                  <th class="py-3 px-4">Friday</th>
+                </tr>
+              </thead>
+              <tbody id="teacher-weekly-matrix-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <div id="teacher-view-timeline" class="space-y-3"></div>
+      <!-- SUBVIEW 2: DLP (DAILY LESSON LOG & PLAN REPOSITORY) -->
+      <div id="subview-dlp" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Daily Lesson Plan Management (DepEd 4As / 7Es)</h3>
+            <p class="text-xs text-slate-500">Create structured digital lesson logs or attach completed DOCX/PDF files and Google Docs.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="https://docs.google.com/document/d/1dJek5poT9sIZHwbfqcPwlnwF2xKMw1Icqducqe2tA7k/copy" target="_blank" class="px-3 py-1.5 rounded-xl border border-blue-300 dark:border-blue-800 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 text-xs font-semibold flex items-center gap-1.5 hover:bg-blue-100">
+              <i class="ph-bold ph-google-logo"></i>
+              <span>Junior High Template</span>
+            </a>
+            <a href="https://docs.google.com/document/d/1oveExgLydYJlBWAqdz0xjzYoHpAw5nzj/copy" target="_blank" class="px-3 py-1.5 rounded-xl border border-indigo-300 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 text-xs font-semibold flex items-center gap-1.5 hover:bg-indigo-100">
+              <i class="ph-bold ph-google-logo"></i>
+              <span>Senior High (11-12) Template</span>
+            </a>
+            <button id="btn-open-new-dlp" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-md flex items-center gap-1.5">
+              <i class="ph-bold ph-plus"></i>
+              <span>New DLP / Upload File</span>
+            </button>
+          </div>
+        </div>
 
-      <div id="teacher-view-weekly" class="hidden overflow-x-auto">
-        <div class="min-w-[800px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider">
-                <th class="py-3 px-4 w-28">Time Slot</th>
-                <th class="py-3 px-4">Monday</th>
-                <th class="py-3 px-4">Tuesday</th>
-                <th class="py-3 px-4">Wednesday</th>
-                <th class="py-3 px-4">Thursday</th>
-                <th class="py-3 px-4">Friday</th>
-              </tr>
-            </thead>
-            <tbody id="teacher-weekly-matrix-body" class="divide-y divide-slate-100 dark:divide-slate-800">
-            </tbody>
-          </table>
+        <div id="dlp-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated DLPs -->
         </div>
       </div>
+
     </section>
 
     <!-- 3. PRINCIPAL DASHBOARD -->
     <section id="view-principal-dashboard" class="hidden space-y-6">
-      
       <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 text-white shadow-xl border border-indigo-800/40">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="flex items-center gap-4">
@@ -292,7 +317,7 @@
                 <h2 class="text-2xl font-bold tracking-tight">Office of the School Principal</h2>
                 <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/40 text-indigo-200 border border-indigo-400/30 font-medium">Master Access</span>
               </div>
-              <p class="text-xs text-indigo-200/80 mt-1">Superuser Administrative Timetable Management & Faculty Monitor</p>
+              <p class="text-xs text-indigo-200/80 mt-1">Superuser Management • Campus Timetable • DLP Approval Registry</p>
             </div>
           </div>
 
@@ -306,6 +331,26 @@
               <span>Faculty PIN Manager</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Principal DLP Review Registry -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="ph-bold ph-stamp text-indigo-600"></i>
+              <span>Faculty Daily Lesson Plans (DLP) Submissions & Endorsement</span>
+            </h3>
+            <p class="text-xs text-slate-500">Review, verify, and approve Junior High and Senior High Lesson Plans.</p>
+          </div>
+          <span id="principal-dlp-pending-badge" class="text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold">
+            0 Pending Submissions
+          </span>
+        </div>
+
+        <div id="principal-dlp-review-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <!-- Populated with all faculty submitted DLPs -->
         </div>
       </div>
 
@@ -342,10 +387,111 @@
         <div id="principal-selected-teacher-container" class="space-y-3">
         </div>
       </div>
-
     </section>
 
   </main>
+
+  <!-- ================= DLP MODAL (CREATE INTERACTIVE / UPLOAD FILE) ================= -->
+  <div id="modal-dlp" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <div>
+          <h3 id="modal-dlp-title" class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="ph-bold ph-notebook text-emerald-500"></i>
+            Daily Lesson Plan (DLP)
+          </h3>
+          <p class="text-xs text-slate-500">Create new structured log or upload completed Google Docs / PDF</p>
+        </div>
+        <button id="btn-close-dlp-modal" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <form id="dlp-form" class="space-y-4 overflow-y-auto flex-1 pr-1">
+        <input type="hidden" id="dlp-id-input" value="">
+        
+        <!-- Submission Mode Selector -->
+        <div class="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+          <button type="button" id="dlp-mode-btn-form" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white">
+            Use Interactive Form
+          </button>
+          <button type="button" id="dlp-mode-btn-upload" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300">
+            Upload File / Paste Doc Link
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Lesson Title / Subject</label>
+            <input type="text" id="dlp-title-input" required placeholder="e.g. General Chemistry: Stoichiometry" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">DepEd Curriculum Level & Template</label>
+            <select id="dlp-level-select" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+              <option value="JHS">Junior High School (Grades 7 - 10)</option>
+              <option value="SHS">Senior High School (Grades 11 - 12)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Target Date</label>
+            <input type="date" id="dlp-date-input" required class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Grade Level & Section</label>
+            <input type="text" id="dlp-grade-section" placeholder="e.g. Grade 11 - STEM A" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+        </div>
+
+        <!-- MODE 1: INTERACTIVE FORM CONTAINER -->
+        <div id="dlp-interactive-fields" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Learning Competency & MELC Code</label>
+            <textarea id="dlp-competency" rows="2" placeholder="e.g. Determine the mass relationship in chemical reactions (STEM_GC11MR-Ib-64)" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Learning Resources & References</label>
+              <textarea id="dlp-resources" rows="2" placeholder="Teacher's Guide, Learner's Module, Lab Equipment..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Formative Assessment / Evaluation</label>
+              <textarea id="dlp-assessment" rows="2" placeholder="Exit ticket, 5-item short quiz, rubric-scored output..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Procedure (DepEd 4As: Activity, Analysis, Abstraction, Application)</label>
+            <textarea id="dlp-procedures" rows="4" placeholder="Outline the 4As or 7Es classroom flow..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
+          </div>
+        </div>
+
+        <!-- MODE 2: FILE UPLOAD OR DOC LINK CONTAINER -->
+        <div id="dlp-upload-fields" class="hidden space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Option 1: Google Docs / Cloud Link</label>
+            <input type="url" id="dlp-link-input" placeholder="https://docs.google.com/document/d/..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Option 2: Attach Word / PDF Document</label>
+            <input type="file" id="dlp-file-input" accept=".pdf,.doc,.docx,.txt" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+            <span id="dlp-file-name-label" class="text-[11px] text-emerald-600 mt-1 block"></span>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+          <button type="button" id="btn-cancel-dlp-modal" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 flex items-center gap-1.5">
+            <i class="ph-bold ph-paper-plane-tilt"></i>
+            <span>Submit to Cloud</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- ================= CREDENTIALS MODAL ================= -->
   <div id="modal-credentials" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -380,9 +526,7 @@
         </div>
 
         <div class="text-xs font-bold uppercase text-slate-400 tracking-wider pt-2 px-1">12 Faculty Accounts (Self-Isolated)</div>
-
-        <div id="credentials-list" class="space-y-1.5">
-        </div>
+        <div id="credentials-list" class="space-y-1.5"></div>
       </div>
 
       <div class="pt-3 border-t border-slate-200 dark:border-slate-800 text-right">
@@ -576,7 +720,7 @@
     let currentUserFirebase = null;
     let isCloudReady = false;
 
-    // 1. DEFAULT DATA CONFIGURATION (All 12 Teachers)
+    // 1. DEFAULT DATA CONFIGURATION
     const DEFAULT_FACULTY = [
       {
         id: 'borla',
@@ -842,42 +986,48 @@
       title: 'Principal IV'
     };
 
-    // Application state
+    // State Variables
     let faculty = JSON.parse(JSON.stringify(DEFAULT_FACULTY));
     let principalPin = '1234';
-    let memoText = "Welcome to the School Year! Teachers may inspect and manage their individual timetable below.";
+    let memoText = "Welcome to the School Year! Teachers may inspect and manage their timetable and DLPs below.";
+    let dlpList = []; // Centralized DLPs
     let currentUser = null; 
+    let activeSuiteTab = 'timetable'; // 'timetable' or 'dlp'
     let teacherActiveTab = 'timeline';
     let isSimulated = false;
     let simDay = 5;
     let simMinutes = 8 * 60;
     let selectedPrincipalTeacherId = 'borla';
     let tempImageBase64 = null;
+    let tempDlpFileBase64 = null;
+    let tempDlpFileName = null;
+    let currentDlpMode = 'form'; // 'form' or 'upload'
 
-    // Restore local session if exists
+    // Local session restore
     const savedUser = sessionStorage.getItem('school_auth_session');
     if (savedUser) {
       try { currentUser = JSON.parse(savedUser); } catch (e) { currentUser = null; }
     }
 
-    // LocalStorage fallback cache
     function loadLocalCache() {
-      const saved = localStorage.getItem('school_timetable_cache_v5');
+      const saved = localStorage.getItem('school_suite_cache_v1');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (parsed.faculty) faculty = parsed.faculty;
           if (parsed.principalPin) principalPin = parsed.principalPin;
           if (parsed.memoText !== undefined) memoText = parsed.memoText;
+          if (parsed.dlpList) dlpList = parsed.dlpList;
         } catch (e) {}
       }
     }
 
     function saveLocalCache() {
-      localStorage.setItem('school_timetable_cache_v5', JSON.stringify({
+      localStorage.setItem('school_suite_cache_v1', JSON.stringify({
         faculty,
         principalPin,
-        memoText
+        memoText,
+        dlpList
       }));
     }
 
@@ -896,7 +1046,7 @@
       }
     }
 
-    // Single unified sync function: Always writes to the EXACT document the listener reads
+    // Cloud synchronization
     async function syncToCloud() {
       saveLocalCache();
       if (!isCloudReady || !db) return;
@@ -907,6 +1057,7 @@
           faculty: JSON.stringify(faculty),
           principalPin: principalPin,
           memoText: memoText,
+          dlpList: JSON.stringify(dlpList),
           lastUpdated: new Date().toISOString()
         }, { merge: true });
         updateSyncIndicator('connected');
@@ -924,7 +1075,6 @@
       }
     }
 
-    // Initialize Firebase and Real-Time Listener
     async function setupFirebaseSync() {
       loadLocalCache();
       renderApp();
@@ -949,7 +1099,6 @@
         isCloudReady = true;
         updateSyncIndicator('connected');
 
-        // Master cloud document listener
         const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'timetable', 'master');
         onSnapshot(publicDocRef, (docSnap) => {
           if (docSnap.exists()) {
@@ -957,7 +1106,6 @@
             if (data.faculty) {
               try {
                 const cloudFaculty = JSON.parse(data.faculty);
-                // Merge cloud data with DEFAULT_FACULTY, always giving priority to cloud edits & custom photos
                 faculty = DEFAULT_FACULTY.map(def => {
                   const match = cloudFaculty.find(cf => cf.id === def.id);
                   if (match) {
@@ -973,12 +1121,14 @@
             }
             if (data.principalPin) principalPin = data.principalPin;
             if (data.memoText !== undefined) memoText = data.memoText;
+            if (data.dlpList) {
+              try { dlpList = JSON.parse(data.dlpList); } catch (e) { console.error(e); }
+            }
             
             saveLocalCache();
             updateSyncIndicator('connected');
             renderApp();
           } else {
-            // First time setup on Firestore: seed it
             syncToCloud();
           }
         }, (error) => {
@@ -992,7 +1142,7 @@
       }
     }
 
-    // 3. TIME AND CLOCK FUNCTIONS
+    // Time Utilities
     function getCurrentDayAndMinutes() {
       if (isSimulated) {
         return { day: simDay, minutes: simMinutes };
@@ -1043,14 +1193,13 @@
 
     setInterval(updateNavClock, 1000);
 
-    // 4. AUTHENTICATION CONTROLLER (ISOLATION CORE)
+    // Auth Handlers
     function handleLoginSubmit(e) {
       e.preventDefault();
       const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
       const pinInput = document.getElementById('login-pin').value.trim();
       const errorBox = document.getElementById('login-error');
 
-      // Check Principal
       if (usernameInput === DEFAULT_PRINCIPAL_USER.username) {
         if (pinInput === principalPin) {
           currentUser = { role: 'principal' };
@@ -1060,7 +1209,6 @@
         }
       }
 
-      // Check Teachers
       const teacher = faculty.find(t => t.username.toLowerCase() === usernameInput);
       if (teacher) {
         if (teacher.pin === pinInput) {
@@ -1095,7 +1243,7 @@
       renderApp();
     }
 
-    // 5. RENDERING CORE VIEWS ACCORDING TO ROLES
+    // App View Switching
     function renderApp() {
       const loginView = document.getElementById('view-login');
       const teacherView = document.getElementById('view-teacher-dashboard');
@@ -1183,7 +1331,7 @@
       }
     }
 
-    // 6. TEACHER DASHBOARD LOGIC (ISOLATED VIEW)
+    // Teacher Dashboard Logic
     function renderTeacherDashboard() {
       const teacher = faculty.find(t => t.id === currentUser.teacherId);
       if (!teacher) return;
@@ -1202,6 +1350,26 @@
         avatarContainer.textContent = getInitials(teacher.name);
       }
 
+      if (activeSuiteTab === 'timetable') {
+        document.getElementById('subview-timetable').classList.remove('hidden');
+        document.getElementById('subview-dlp').classList.add('hidden');
+        
+        document.getElementById('suite-tab-timetable').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5';
+        document.getElementById('suite-tab-dlp').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5';
+        
+        renderTimetableSubmodule(teacher);
+      } else {
+        document.getElementById('subview-timetable').classList.add('hidden');
+        document.getElementById('subview-dlp').classList.remove('hidden');
+        
+        document.getElementById('suite-tab-dlp').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5';
+        document.getElementById('suite-tab-timetable').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5';
+        
+        renderTeacherDlpSubmodule(teacher);
+      }
+    }
+
+    function renderTimetableSubmodule(teacher) {
       const { day, minutes } = getCurrentDayAndMinutes();
       const currentPeriod = getActivePeriodForTeacher(teacher, day, minutes);
       const liveBox = document.getElementById('teacher-live-indicator');
@@ -1371,7 +1539,6 @@
 
     function renderTeacherWeekly(teacher) {
       const tbody = document.getElementById('teacher-weekly-matrix-body');
-      
       const slotMap = new Map();
       teacher.periods.forEach(p => {
         const key = `${p.start}-${p.end}`;
@@ -1426,7 +1593,77 @@
       }).join('');
     }
 
-    // 7. PRINCIPAL MASTER DASHBOARD LOGIC
+    // Teacher DLP Submodule
+    function renderTeacherDlpSubmodule(teacher) {
+      const container = document.getElementById('dlp-list-container');
+      const teacherDlps = dlpList.filter(d => d.teacherId === teacher.id);
+
+      if (teacherDlps.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <i class="ph-bold ph-notebook text-3xl text-slate-400 mb-2"></i>
+            <p class="text-xs text-slate-500">No lesson plans created yet. Click "New DLP / Upload File" above to get started.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = teacherDlps.map(dlp => {
+        let statusBadge = dlp.approved 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300"><i class="ph-bold ph-check"></i> Approved by Principal</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"><i class="ph-bold ph-clock"></i> Pending Review</span>`;
+
+        let levelBadge = dlp.level === 'SHS' 
+          ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">Grade 11-12 SHS</span>`
+          : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Grade 7-10 JHS</span>`;
+
+        let fileAttachment = '';
+        if (dlp.docLink) {
+          fileAttachment = `
+            <a href="${escapeHtml(dlp.docLink)}" target="_blank" class="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-2">
+              <i class="ph-bold ph-arrow-square-out"></i> Open Linked Google Doc
+            </a>
+          `;
+        } else if (dlp.fileData) {
+          fileAttachment = `
+            <a href="${dlp.fileData}" download="${dlp.fileName || 'Lesson_Plan'}" class="text-xs text-emerald-600 hover:underline flex items-center gap-1 mt-2">
+              <i class="ph-bold ph-download-simple"></i> Download Attached (${escapeHtml(dlp.fileName || 'Document')})
+            </a>
+          `;
+        }
+
+        return `
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                ${levelBadge}
+                ${statusBadge}
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(dlp.title)}</h4>
+              <div class="text-[11px] text-slate-500 mt-1">Date: <b>${escapeHtml(dlp.date)}</b> | Section: <b>${escapeHtml(dlp.gradeSection || 'All')}</b></div>
+              
+              ${dlp.competency ? `<p class="text-xs text-slate-600 dark:text-slate-300 mt-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-xl"><b>Competency:</b> ${escapeHtml(dlp.competency)}</p>` : ''}
+              ${fileAttachment}
+            </div>
+
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
+              <span class="text-[10px] text-slate-400">Created: ${new Date(dlp.createdAt).toLocaleDateString()}</span>
+              <div class="flex items-center gap-1">
+                <button data-delete-dlp="${dlp.id}" class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 rounded-lg">
+                  <i class="ph-bold ph-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('[data-delete-dlp]').forEach(btn => {
+        btn.onclick = () => deleteDlp(btn.dataset.deleteDlp);
+      });
+    }
+
+    // Principal Dashboard
     function renderPrincipalDashboard() {
       const select = document.getElementById('principal-teacher-select');
       select.innerHTML = faculty.map(t => `
@@ -1437,6 +1674,74 @@
 
       renderPrincipalMonitorGrid();
       renderPrincipalSelectedTeacherSchedule();
+      renderPrincipalDlpReviews();
+    }
+
+    function renderPrincipalDlpReviews() {
+      const grid = document.getElementById('principal-dlp-review-grid');
+      const pendingBadge = document.getElementById('principal-dlp-pending-badge');
+      const pendingCount = dlpList.filter(d => !d.approved).length;
+      pendingBadge.textContent = `${pendingCount} Pending Approval`;
+
+      if (dlpList.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-6 text-center text-xs text-slate-400">No teacher lesson plans submitted yet.</div>`;
+        return;
+      }
+
+      grid.innerHTML = dlpList.map(dlp => {
+        const teacher = faculty.find(t => t.id === dlp.teacherId);
+        const teacherName = teacher ? teacher.name : 'Teacher';
+
+        let docAction = '';
+        if (dlp.docLink) {
+          docAction = `<a href="${escapeHtml(dlp.docLink)}" target="_blank" class="px-2 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-semibold hover:underline">Inspect Google Doc</a>`;
+        } else if (dlp.fileData) {
+          docAction = `<a href="${dlp.fileData}" download="${dlp.fileName || 'Lesson_Plan'}" class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-semibold hover:underline">Download File</a>`;
+        }
+
+        return `
+          <div class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-[11px] mb-1.5">
+                <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHtml(teacherName)}</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${dlp.level === 'SHS' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800'}">${dlp.level}</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(dlp.title)}</div>
+              <div class="text-[10px] text-slate-500">Target Date: ${escapeHtml(dlp.date)} | ${escapeHtml(dlp.gradeSection || '')}</div>
+              ${dlp.competency ? `<div class="text-[11px] text-slate-600 dark:text-slate-300 mt-1 line-clamp-2 bg-white dark:bg-slate-900 p-1.5 rounded-lg border border-slate-200 dark:border-slate-800">${escapeHtml(dlp.competency)}</div>` : ''}
+            </div>
+
+            <div class="pt-3 mt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2">
+              ${docAction}
+              ${dlp.approved 
+                ? `<span class="text-[11px] font-bold text-emerald-600 flex items-center gap-1"><i class="ph-bold ph-seal-check"></i> Approved</span>`
+                : `<button data-approve-dlp="${dlp.id}" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">Approve & Sign</button>`
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('[data-approve-dlp]').forEach(btn => {
+        btn.onclick = () => approveDlp(btn.dataset.approveDlp);
+      });
+    }
+
+    async function approveDlp(dlpId) {
+      const match = dlpList.find(d => d.id === dlpId);
+      if (match) {
+        match.approved = true;
+        match.approvedAt = new Date().toISOString();
+        renderPrincipalDashboard();
+        await syncToCloud();
+      }
+    }
+
+    async function deleteDlp(dlpId) {
+      if (!confirm("Are you sure you want to remove this Lesson Plan?")) return;
+      dlpList = dlpList.filter(d => d.id !== dlpId);
+      renderApp();
+      await syncToCloud();
     }
 
     function renderPrincipalMonitorGrid() {
@@ -1558,7 +1863,7 @@
       });
     }
 
-    // 8. PERIOD EDIT / DELETE MODAL HANDLERS
+    // Modal Operations
     function openAddPeriodModal() {
       if (!currentUser || currentUser.role !== 'teacher') return;
       openAddPeriodModalForTeacher(currentUser.teacherId);
@@ -1616,9 +1921,7 @@
       const dayCheckboxes = document.querySelectorAll('input[name="period-day"]:checked');
       const selectedDays = Array.from(dayCheckboxes).map(cb => parseInt(cb.value));
 
-      if (selectedDays.length === 0) {
-        return;
-      }
+      if (selectedDays.length === 0) return;
 
       const newPeriod = {
         title: document.getElementById('period-name-input').value.trim(),
@@ -1649,7 +1952,7 @@
       await syncToCloud();
     }
 
-    // 9. PROFILE & PHOTO EDITING LOGIC
+    // Profile Modals
     function openEditProfileModal() {
       if (!currentUser || currentUser.role !== 'teacher') return;
       openPrincipalEditTeacherModal(currentUser.teacherId);
@@ -1695,7 +1998,7 @@
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
-          const maxDim = 200; // Perfect profile avatar dimensions
+          const maxDim = 200;
           let width = img.width;
           let height = img.height;
 
@@ -1716,7 +2019,6 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Ultra-optimized quality keeps file size small for Firestore
           tempImageBase64 = canvas.toDataURL('image/jpeg', 0.65);
           updateProfilePreviewAvatar(document.getElementById('profile-name-input').value, tempImageBase64);
         };
@@ -1746,19 +2048,102 @@
         teacher.pin = newPin;
       }
 
-      // If user selected a new photo or cleared it, update it
       if (tempImageBase64 !== null) {
         teacher.avatar = tempImageBase64;
       }
 
       closeEditProfileModal();
       renderApp();
-      
-      // Save directly to Firestore cloud master document
       await syncToCloud();
     }
 
-    // 10. PRINCIPAL MEMO BROADCAST
+    // DLP Modal Handlers
+    function openDlpModal() {
+      document.getElementById('dlp-id-input').value = '';
+      document.getElementById('dlp-title-input').value = '';
+      document.getElementById('dlp-date-input').value = new Date().toISOString().split('T')[0];
+      document.getElementById('dlp-grade-section').value = '';
+      document.getElementById('dlp-competency').value = '';
+      document.getElementById('dlp-resources').value = '';
+      document.getElementById('dlp-assessment').value = '';
+      document.getElementById('dlp-procedures').value = '';
+      document.getElementById('dlp-link-input').value = '';
+      document.getElementById('dlp-file-input').value = '';
+      document.getElementById('dlp-file-name-label').textContent = '';
+      tempDlpFileBase64 = null;
+      tempDlpFileName = null;
+
+      setDlpMode('form');
+      document.getElementById('modal-dlp').classList.remove('hidden');
+    }
+
+    function closeDlpModal() {
+      document.getElementById('modal-dlp').classList.add('hidden');
+    }
+
+    function setDlpMode(mode) {
+      currentDlpMode = mode;
+      const btnForm = document.getElementById('dlp-mode-btn-form');
+      const btnUpload = document.getElementById('dlp-mode-btn-upload');
+      const formFields = document.getElementById('dlp-interactive-fields');
+      const uploadFields = document.getElementById('dlp-upload-fields');
+
+      if (mode === 'form') {
+        btnForm.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white';
+        btnUpload.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300';
+        formFields.classList.remove('hidden');
+        uploadFields.classList.add('hidden');
+      } else {
+        btnUpload.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white';
+        btnForm.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300';
+        formFields.classList.add('hidden');
+        uploadFields.classList.remove('hidden');
+      }
+    }
+
+    function handleDlpFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      tempDlpFileName = file.name;
+      document.getElementById('dlp-file-name-label').textContent = `Attached: ${file.name}`;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        tempDlpFileBase64 = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleDlpSubmit(e) {
+      e.preventDefault();
+      if (!currentUser || currentUser.role !== 'teacher') return;
+
+      const newDlp = {
+        id: 'dlp_' + Date.now(),
+        teacherId: currentUser.teacherId,
+        title: document.getElementById('dlp-title-input').value.trim(),
+        level: document.getElementById('dlp-level-select').value,
+        date: document.getElementById('dlp-date-input').value,
+        gradeSection: document.getElementById('dlp-grade-section').value.trim(),
+        competency: document.getElementById('dlp-competency').value.trim(),
+        resources: document.getElementById('dlp-resources').value.trim(),
+        assessment: document.getElementById('dlp-assessment').value.trim(),
+        procedures: document.getElementById('dlp-procedures').value.trim(),
+        docLink: document.getElementById('dlp-link-input').value.trim(),
+        fileData: tempDlpFileBase64,
+        fileName: tempDlpFileName,
+        approved: false,
+        createdAt: new Date().toISOString()
+      };
+
+      dlpList.unshift(newDlp);
+      closeDlpModal();
+      renderApp();
+      await syncToCloud();
+    }
+
+    // Memo Handlers
     function openBroadcastMemoModal() {
       document.getElementById('memo-text-input').value = memoText;
       document.getElementById('modal-memo').classList.remove('hidden');
@@ -1787,7 +2172,7 @@
       document.getElementById('announcement-banner').classList.add('hidden');
     }
 
-    // 11. CREDENTIALS MODAL BUILDER
+    // Credentials Modal
     function openCredentialsModal() {
       const list = document.getElementById('credentials-list');
       document.getElementById('credentials-principal-pin').textContent = principalPin;
@@ -1818,7 +2203,7 @@
       document.getElementById('modal-credentials').classList.add('hidden');
     }
 
-    // 12. TIME SIMULATOR CONTROLS
+    // Simulator
     function toggleSimDrawer() {
       const drawer = document.getElementById('sim-drawer');
       drawer.classList.toggle('hidden');
@@ -1841,7 +2226,6 @@
       updateNavClock();
     }
 
-    // 13. HELPERS
     function getActivePeriodForTeacher(teacher, day, currentMinutes) {
       if (day < 1 || day > 5) return null;
       return teacher.periods.find(p => {
@@ -1887,6 +2271,16 @@
       document.getElementById('btn-apply-sim').onclick = applySimulation;
       document.getElementById('btn-reset-sim').onclick = resetSimulation;
 
+      // Suite Tab Switching
+      document.getElementById('suite-tab-timetable').onclick = () => {
+        activeSuiteTab = 'timetable';
+        renderTeacherDashboard();
+      };
+      document.getElementById('suite-tab-dlp').onclick = () => {
+        activeSuiteTab = 'dlp';
+        renderTeacherDashboard();
+      };
+
       document.getElementById('tab-btn-timeline').onclick = () => setTeacherViewTab('timeline');
       document.getElementById('tab-btn-weekly').onclick = () => setTeacherViewTab('weekly');
 
@@ -1902,6 +2296,15 @@
       document.getElementById('btn-close-period-modal').onclick = closePeriodModal;
       document.getElementById('btn-cancel-period-modal').onclick = closePeriodModal;
       document.getElementById('period-form').onsubmit = handlePeriodSave;
+
+      // DLP Mode Switchers
+      document.getElementById('btn-open-new-dlp').onclick = openDlpModal;
+      document.getElementById('btn-close-dlp-modal').onclick = closeDlpModal;
+      document.getElementById('btn-cancel-dlp-modal').onclick = closeDlpModal;
+      document.getElementById('dlp-mode-btn-form').onclick = () => setDlpMode('form');
+      document.getElementById('dlp-mode-btn-upload').onclick = () => setDlpMode('upload');
+      document.getElementById('dlp-file-input').onchange = handleDlpFileUpload;
+      document.getElementById('dlp-form').onsubmit = handleDlpSubmit;
 
       document.getElementById('btn-open-memo').onclick = openBroadcastMemoModal;
       document.getElementById('btn-close-memo-modal').onclick = closeBroadcastMemoModal;
