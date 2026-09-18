@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Timetable & Schedule Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons CDN -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white !important; color: black !important; font-size: 11pt; }
+      .print-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; break-inside: avoid; }
+    }
+    .print-only { display: none; }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans antialiased transition-colors">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="no-print sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & School Logo -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 font-bold text-xl">
+          <i class="ph-bold ph-graduation-cap"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+            Faculty Portal
+            <span id="role-badge" class="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+              Not Logged In
+            </span>
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Timetable & Schedule Management System</p>
+        </div>
+      </div>
+
+      <!-- Live Clock & Status Bar -->
+      <div class="hidden md:flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700/80 text-xs">
+        <div class="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span id="nav-day-name">Friday</span>
+        </div>
+        <span class="text-slate-300 dark:text-slate-600">|</span>
+        <div id="nav-clock" class="font-mono font-semibold text-slate-700 dark:text-slate-200">
+          07:00:00 AM
+        </div>
+      </div>
+
+      <!-- Action Utilities & Auth Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Simulator Toggle (Always useful for testing) -->
+        <button id="btn-toggle-sim" onclick="toggleSimDrawer()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center gap-1.5 transition">
+          <i class="ph ph-sliders"></i>
+          <span class="hidden sm:inline">Simulate Time</span>
+        </button>
+
+        <!-- Credentials Reference Helper Modal Trigger -->
+        <button onclick="openCredentialsModal()" class="px-2.5 py-1.5 text-xs rounded-lg border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 transition flex items-center gap-1.5">
+          <i class="ph-bold ph-key"></i>
+          <span class="hidden sm:inline">Accounts & PINs</span>
+        </button>
+
+        <!-- Authenticated User Profile Dropdown / Sign In Button -->
+        <div id="auth-nav-container"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= ANNOUNCEMENT BANNER ================= -->
+  <div id="announcement-banner" class="no-print hidden bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 px-4 py-2.5 text-xs text-amber-800 dark:text-amber-200">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 font-medium">
+        <i class="ph-fill ph-megaphone-simple text-amber-600 dark:text-amber-400 text-base"></i>
+        <span id="announcement-text">School Principal Memo: All teachers please check final examination schedules.</span>
+      </div>
+      <button onclick="dismissAnnouncement()" class="text-amber-600 dark:text-amber-400 hover:text-amber-800 text-sm p-0.5">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= TIME SIMULATOR DRAWER (Collapsible) ================= -->
+  <div id="sim-drawer" class="no-print hidden bg-slate-900 text-white border-b border-slate-800 px-4 py-3 transition-all">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2">
+        <i class="ph-bold ph-clock-countdown text-emerald-400 text-base"></i>
+        <span class="font-semibold">Schedule Time Machine:</span>
+        <span class="text-slate-400">Test schedules at any time/day</span>
+      </div>
+      <div class="flex items-center flex-wrap gap-2">
+        <select id="sim-day-select" class="bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-white">
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5" selected>Friday</option>
+          <option value="6">Saturday</option>
+          <option value="0">Sunday</option>
+        </select>
+        <input type="time" id="sim-time-input" value="08:00" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+        <button onclick="applySimulation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-medium transition">Apply</button>
+        <button onclick="resetSimulation()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded font-medium transition">Live Real Time</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP VIEWPORT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- 1. LOGIN SCREEN (Shown if no user is signed in) -->
+    <section id="view-login" class="py-12 max-w-md mx-auto">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-slate-200/80 dark:border-slate-800 text-center">
+        <div class="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-emerald-500/30 mb-4">
+          <i class="ph-bold ph-lock-key"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Sign In to Your Schedule</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">
+          Teachers have access strictly to their own schedule and profile. The Principal has master access.
+        </p>
+
+        <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4 text-left">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">Account Username</label>
+            <div class="relative">
+              <i class="ph ph-user absolute left-3.5 top-3 text-slate-400 text-base"></i>
+              <input type="text" id="login-username" required placeholder="e.g. kent.borla or principal" 
+                class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">Access PIN</label>
+            <div class="relative">
+              <i class="ph ph-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
+              <input type="password" id="login-pin" required placeholder="Default PIN: 1234" 
+                class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white outline-none">
+            </div>
+          </div>
+
+          <div id="login-error" class="hidden p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs text-center font-medium"></div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+            <span>Sign In Securely</span>
+            <i class="ph-bold ph-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+          <button onclick="openCredentialsModal()" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+            Forgot PIN or view all teacher usernames?
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TEACHER ISOLATED DASHBOARD (Strictly only their own schedule) -->
+    <section id="view-teacher-dashboard" class="hidden space-y-6">
+
+      <!-- Teacher Identity Hero Banner -->
+      <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div class="relative group">
+              <div id="teacher-hero-avatar" class="w-20 h-20 rounded-2xl bg-emerald-600/60 border-2 border-white/20 flex items-center justify-center font-bold text-2xl text-white shadow-lg overflow-hidden bg-cover bg-center">
+                <!-- Avatar image or initials -->
+              </div>
+              <button onclick="openEditProfileModal()" title="Upload Photo" class="absolute -bottom-1 -right-1 bg-white text-slate-800 p-1.5 rounded-lg shadow hover:bg-slate-100 text-xs">
+                <i class="ph-bold ph-camera"></i>
+              </button>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="teacher-hero-name" class="text-2xl font-bold tracking-tight">Teacher Name</h2>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">Personal Access</span>
+              </div>
+              <p id="teacher-hero-dept" class="text-sm text-emerald-100/80">Department & Advisory</p>
+              <div class="flex items-center gap-3 mt-2 text-xs text-emerald-200/70">
+                <span id="teacher-hero-room"><i class="ph ph-map-pin"></i> Assigned Room</span>
+                <span>•</span>
+                <span id="teacher-hero-email"><i class="ph ph-envelope"></i> DepEd Email</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Controls -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openEditProfileModal()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
+              <i class="ph-bold ph-user-gear"></i>
+              <span>Edit Profile & Photo</span>
+            </button>
+            <button onclick="openAddPeriodModal()" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-white shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5">
+              <i class="ph-bold ph-plus-circle"></i>
+              <span>Add Custom Period</span>
+            </button>
+            <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
+              <i class="ph ph-printer"></i>
+              <span class="hidden sm:inline">Print Timetable</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Class Live Pulse Bar -->
+      <div id="teacher-live-indicator" class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <!-- Injected via JavaScript based on simulated/live time -->
+      </div>
+
+      <!-- View Mode Tabs (Daily Timeline vs Weekly Grid) -->
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <button id="tab-btn-timeline" onclick="setTeacherViewTab('timeline')" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition">
+            Today's Timeline
+          </button>
+          <button id="tab-btn-weekly" onclick="setTeacherViewTab('weekly')" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition">
+            Full Weekly Matrix (Mon - Fri)
+          </button>
+        </div>
+        <div class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
+          <i class="ph ph-info"></i> Changes are saved automatically on this device.
+        </div>
+      </div>
+
+      <!-- Content Container for Timeline -->
+      <div id="teacher-view-timeline" class="space-y-3">
+        <!-- Rendered Schedule Periods -->
+      </div>
+
+      <!-- Content Container for Weekly Matrix Grid -->
+      <div id="teacher-view-weekly" class="hidden overflow-x-auto">
+        <div class="min-w-[800px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider">
+                <th class="py-3 px-4 w-28">Time Slot</th>
+                <th class="py-3 px-4">Monday</th>
+                <th class="py-3 px-4">Tuesday</th>
+                <th class="py-3 px-4">Wednesday</th>
+                <th class="py-3 px-4">Thursday</th>
+                <th class="py-3 px-4">Friday</th>
+              </tr>
+            </thead>
+            <tbody id="teacher-weekly-matrix-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PRINCIPAL MASTER CONTROL PANEL (Has School-Wide Access) -->
+    <section id="view-principal-dashboard" class="hidden space-y-6">
+      
+      <!-- Principal Control Header -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 text-white shadow-xl border border-indigo-800/40">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-2xl text-white shadow-lg shadow-indigo-600/30">
+              <i class="ph-bold ph-shield-star"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-2xl font-bold tracking-tight">Office of the School Principal</h2>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/40 text-indigo-200 border border-indigo-400/30 font-medium">Master Access</span>
+              </div>
+              <p class="text-xs text-indigo-200/80 mt-1">Superuser Administrative Timetable Management & Faculty Monitor</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openBroadcastMemoModal()" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md transition flex items-center gap-1.5">
+              <i class="ph-bold ph-megaphone"></i>
+              <span>Post Memo / Banner</span>
+            </button>
+            <button onclick="openCredentialsModal()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
+              <i class="ph ph-users-three"></i>
+              <span>Faculty PIN Manager</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Campus Activity Monitor: What Every Teacher is Doing Right Now -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Live Faculty Class Monitor</h3>
+          </div>
+          <span id="principal-live-count" class="text-xs px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
+            0/12 Teachers Currently Teaching
+          </span>
+        </div>
+
+        <div id="principal-faculty-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <!-- Populated with live cards for all 12 teachers -->
+        </div>
+      </div>
+
+      <!-- Principal's Dedicated Inspection/Editing Area for Any Selected Teacher -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Individual Teacher Schedule Manager</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Select any teacher below to inspect, edit their periods, or modify their profile.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-semibold text-slate-500">Teacher:</label>
+            <select id="principal-teacher-select" onchange="handlePrincipalTeacherChange()" class="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+              <!-- Teacher options generated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Selected Teacher Schedule Canvas for Principal -->
+        <div id="principal-selected-teacher-container" class="space-y-3">
+          <!-- Detailed periods render here -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= CREDENTIALS & PIN MODAL ================= -->
+  <div id="modal-credentials" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="ph-bold ph-key text-amber-500"></i>
+            Teacher Accounts & Credentials
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Default PIN for all accounts is <b>1234</b>. Click "Quick Switch" to test.</p>
+        </div>
+        <button onclick="closeCredentialsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg p-1">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto py-3 space-y-2 flex-1 pr-1">
+        <!-- Master Principal Row -->
+        <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+              <i class="ph-bold ph-shield-star"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-indigo-950 dark:text-indigo-200">School Principal (Master Superuser)</div>
+              <div class="text-xs text-indigo-700 dark:text-indigo-400">Username: <code class="font-mono bg-indigo-100 dark:bg-indigo-900 px-1 py-0.5 rounded">principal</code></div>
+            </div>
+          </div>
+          <button onclick="quickLogin('principal')" class="px-2.5 py-1 text-xs rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition">
+            Login as Principal
+          </button>
+        </div>
+
+        <div class="text-xs font-bold uppercase text-slate-400 tracking-wider pt-2 px-1">12 Faculty Accounts (Self-Isolated)</div>
+
+        <!-- 12 Faculty Rows -->
+        <div id="credentials-list" class="space-y-1.5">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 text-right">
+        <button onclick="closeCredentialsModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EDIT PROFILE & PHOTO MODAL ================= -->
+  <div id="modal-edit-profile" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="ph-bold ph-user-circle text-emerald-500"></i>
+          Edit Profile & Upload Photo
+        </h3>
+        <button onclick="closeEditProfileModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <form id="edit-profile-form" onsubmit="handleProfileSave(event)" class="space-y-4">
+        <!-- Photo Upload Preview & Selector -->
+        <div class="flex items-center gap-4">
+          <div id="profile-preview-avatar" class="w-16 h-16 rounded-2xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xl font-bold text-slate-500 overflow-hidden bg-cover bg-center"></div>
+          <div class="space-y-1.5 flex-1">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Upload Photo File</label>
+            <input type="file" id="profile-file-input" accept="image/*" onchange="handleImageFileSelect(event)" 
+              class="block w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+            <button type="button" onclick="clearProfilePhoto()" class="text-[11px] text-rose-500 hover:underline">Remove photo</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Display Name</label>
+          <input type="text" id="profile-name-input" required class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Department / Advisory Track</label>
+          <input type="text" id="profile-dept-input" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Assigned Room</label>
+            <input type="text" id="profile-room-input" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Change PIN (4-Digits)</label>
+            <input type="password" id="profile-pin-input" maxlength="8" placeholder="Keep blank to retain" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+          <button type="button" onclick="closeEditProfileModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ADD / EDIT PERIOD MODAL ================= -->
+  <div id="modal-period" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <h3 id="modal-period-title" class="text-base font-bold text-slate-900 dark:text-white">Add Schedule Period</h3>
+        <button onclick="closePeriodModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <form id="period-form" onsubmit="handlePeriodSave(event)" class="space-y-3.5">
+        <input type="hidden" id="period-index-input" value="-1">
+        <input type="hidden" id="period-teacher-id-input" value="">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Subject / Activity Name</label>
+          <input type="text" id="period-name-input" required placeholder="e.g. Science 7" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Start Time</label>
+            <input type="time" id="period-start-input" required class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">End Time</label>
+            <input type="time" id="period-end-input" required class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Room / Venue</label>
+            <input type="text" id="period-room-input" placeholder="e.g. Room 7-A" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Period Type</label>
+            <select id="period-type-input" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+              <option value="class">Instructional Class</option>
+              <option value="break">Break / Lunch</option>
+              <option value="vacant">Vacant / Prep Time</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Applicable School Days</label>
+          <div class="flex items-center gap-1.5">
+            <label class="flex items-center gap-1 text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer">
+              <input type="checkbox" name="period-day" value="1" checked class="rounded text-emerald-600"> Mon
+            </label>
+            <label class="flex items-center gap-1 text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer">
+              <input type="checkbox" name="period-day" value="2" checked class="rounded text-emerald-600"> Tue
+            </label>
+            <label class="flex items-center gap-1 text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer">
+              <input type="checkbox" name="period-day" value="3" checked class="rounded text-emerald-600"> Wed
+            </label>
+            <label class="flex items-center gap-1 text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer">
+              <input type="checkbox" name="period-day" value="4" checked class="rounded text-emerald-600"> Thu
+            </label>
+            <label class="flex items-center gap-1 text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer">
+              <input type="checkbox" name="period-day" value="5" checked class="rounded text-emerald-600"> Fri
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+          <button type="button" onclick="closePeriodModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500">Save Period</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= PRINCIPAL MEMO MODAL ================= -->
+  <div id="modal-memo" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="ph-bold ph-megaphone text-indigo-500"></i>
+          Broadcast School Principal Memo
+        </h3>
+        <button onclick="closeBroadcastMemoModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <form id="memo-form" onsubmit="handleMemoSave(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Announcement Message</label>
+          <textarea id="memo-text-input" rows="3" required placeholder="Type announcement or urgent notice for faculty..." 
+            class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+          <button type="button" onclick="clearMemo()" class="px-3 py-2 text-xs font-semibold rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40">Clear Banner</button>
+          <button type="button" onclick="closeBroadcastMemoModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 text-white hover:bg-indigo-500">Publish Memo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC & ENGINE ================= -->
+  <script>
+    // 1. DEFAULT DATA CONFIGURATION (All 12 Teachers with Specified Schedules)
+    const DEFAULT_FACULTY = [
+      {
+        id: 'borla',
+        username: 'kent.borla',
+        pin: '1234',
+        name: 'Mr. Kent B. Borla',
+        dept: 'Science & SHS STEM',
+        room: 'Room 7-A / Chem Lab',
+        email: 'kent.borla@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "08:20", title: "Science 7", room: "Room 7-A", type: "class", days: [1,2,3,4,5] },
+          { start: "08:20", end: "09:10", title: "Science 8", room: "Room 8-A", type: "class", days: [1,2,3,4,5] },
+          { start: "09:10", end: "09:45", title: "Break / Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "09:45", end: "11:45", title: "Entrepreneurship 12", room: "SHS Building", type: "class", days: [1,2,3,4] },
+          { start: "09:45", end: "11:45", title: "General Chemistry 12 - STEM", room: "Chemistry Lab", type: "class", days: [5] },
+          { start: "11:45", end: "12:45", title: "Lunch Break", room: "Canteen / Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "12:45", end: "14:45", title: "Vacant / Prep Time", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "14:45", end: "16:45", title: "General Chemistry 12 - STEM", room: "Chemistry Lab", type: "class", days: [3,4,5] }
+        ]
+      },
+      {
+        id: 'carino',
+        username: 'marian.carino',
+        pin: '1234',
+        name: 'Ms. Marian Chyle B. Cariño',
+        dept: 'English & Grade 11 Advisory',
+        room: 'Room 8-B',
+        email: 'marian.carino@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "08:20", title: "English 8", room: "Room 8-B", type: "class", days: [1,2,3,4,5] },
+          { start: "08:20", end: "09:10", title: "English 9", room: "Room 9-B", type: "class", days: [1,2,3,4,5] },
+          { start: "09:10", end: "10:00", title: "English 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
+          { start: "10:00", end: "12:00", title: "Break / Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "14:00", title: "Vacant / Prep", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "14:00", end: "15:30", title: "Homeroom Guidance 11", room: "SHS Room 11", type: "class", days: [1,2,3,4,5] },
+          { start: "15:30", end: "16:30", title: "Vacant / Office Work", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "16:30", end: "17:00", title: "Adviser's Time 11", room: "SHS Room 11", type: "class", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'senagan',
+        username: 'willyn.senagan',
+        pin: '1234',
+        name: 'Ms. Willyn G. Señagan',
+        dept: 'Mathematics & Registrar',
+        room: "Registrar's Office",
+        email: 'willyn.senagan@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "08:20", title: "Math 9", room: "Room 9-A", type: "class", days: [1,2,3,4,5] },
+          { start: "08:20", end: "09:10", title: "Math 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
+          { start: "09:10", end: "10:20", title: "Break / Vacant (Registrar's Office)", room: "Registrar's Office", type: "vacant", days: [1,2,3,4,5] },
+          { start: "10:20", end: "11:20", title: "General Science 11", room: "SHS Room 11", type: "class", days: [1,2,3,4,5] },
+          { start: "11:20", end: "12:00", title: "Vacant (Registrar's Office)", room: "Registrar's Office", type: "vacant", days: [1,2,3,4,5] },
+          { start: "12:00", end: "12:45", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "12:45", end: "14:45", title: "General Physics 12 - STEM", room: "Physics Lab", type: "class", days: [4,5] },
+          { start: "14:45", end: "16:45", title: "General Physics 12 - STEM", room: "Physics Lab", type: "class", days: [1,2] }
+        ]
+      },
+      {
+        id: 'esparcia',
+        username: 'anajea.esparcia',
+        pin: '1234',
+        name: 'Ms. Ana Jea C. Esparcia',
+        dept: 'Science & TLE / Grade 9 Advisory',
+        room: 'TLE Lab',
+        email: 'anajea.esparcia@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "08:20", title: "Science 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
+          { start: "08:20", end: "08:30", title: "Vacant / Transition", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "08:30", end: "10:00", title: "Electives 11 - ASSH", room: "SHS Hall", type: "class", days: [1,2,3,4,5] },
+          { start: "10:00", end: "12:00", title: "Vacant / Prep", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "13:50", title: "TLE 9", room: "TLE Lab", type: "class", days: [1,2,3,4,5] },
+          { start: "13:50", end: "14:40", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "14:40", end: "15:30", title: "TLE 8", room: "TLE Lab", type: "class", days: [1,2,3,4,5] },
+          { start: "15:30", end: "16:30", title: "Homeroom Guidance 9", room: "Room 9-A", type: "class", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'catipay',
+        username: 'john.catipay',
+        pin: '1234',
+        name: 'Mr. John Jelvie D. Catipay',
+        dept: 'Social Science & HUMSS',
+        room: 'Room 9-B',
+        email: 'john.catipay@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "08:30", title: "Life and Career Skills 11", room: "SHS Room 11", type: "class", days: [1,2,3,4,5] },
+          { start: "08:30", end: "10:00", title: "Electives 11 - STEM", room: "STEM Room", type: "class", days: [1,2,3,4,5] },
+          { start: "10:00", end: "10:20", title: "Morning Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "10:20", end: "11:10", title: "Science 9", room: "Room 9-B", type: "class", days: [1,2,3,4,5] },
+          { start: "11:10", end: "12:00", title: "TLE 7", room: "TLE Lab", type: "class", days: [1,2,3,4,5] },
+          { start: "12:00", end: "12:45", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "12:45", end: "14:45", title: "World Religions & Belief Systems - 12 HUMSS", room: "HUMSS 12", type: "class", days: [4,5] },
+          { start: "14:45", end: "16:45", title: "World Religions & Belief Systems - 12 HUMSS", room: "HUMSS 12", type: "class", days: [1,2] }
+        ]
+      },
+      {
+        id: 'dagwayan',
+        username: 'charls.dagwayan',
+        pin: '1234',
+        name: 'Mr. Charls M. Dagwayan',
+        dept: 'ICT & MAPEH / Grade 8 Advisory',
+        room: 'Computer Lab / Gym',
+        email: 'charls.dagwayan@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "09:30", title: "Empowerment Technologies 12", room: "Computer Lab", type: "class", days: [1,2,3,4,5] },
+          { start: "09:30", end: "10:20", title: "Vacant / Lab Maintenance", room: "Computer Lab", type: "vacant", days: [1,2,3,4,5] },
+          { start: "10:20", end: "11:10", title: "MAPEH 8", room: "Gymnasium", type: "class", days: [1,2,3,4,5] },
+          { start: "11:10", end: "12:00", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "13:50", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "13:50", end: "14:40", title: "MAPEH 9", room: "Gymnasium", type: "class", days: [1,2,3,4,5] },
+          { start: "14:40", end: "15:30", title: "MAPEH 10", room: "Gymnasium", type: "class", days: [1,2,3,4,5] },
+          { start: "15:30", end: "16:30", title: "Homeroom Guidance 8", room: "Room 8-A", type: "class", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'antiquina',
+        username: 'chezel.antiquina',
+        pin: '1234',
+        name: 'Ms. Chezel Kaye R. Antiquina',
+        dept: 'Mathematics & Research',
+        room: 'Room 7-B',
+        email: 'chezel.antiquina@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "09:30", title: "Practical Research II 12", room: "SHS Building", type: "class", days: [5] },
+          { start: "09:10", end: "10:00", title: "Math 8", room: "Room 8-B", type: "class", days: [1,2,3,4,5] },
+          { start: "10:00", end: "10:20", title: "Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "10:20", end: "11:10", title: "Math 7", room: "Room 7-B", type: "class", days: [1,2,3,4,5] },
+          { start: "11:10", end: "12:00", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "12:00", end: "12:45", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "12:45", end: "14:45", title: "Practical Research II 12", room: "SHS Building", type: "class", days: [1,2,3] },
+          { start: "14:45", end: "15:30", title: "General Mathematics 11", room: "SHS Room 11", type: "class", days: [1,2,3,4,5] },
+          { start: "15:30", end: "16:30", title: "Vacant / Consultations", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'rodriguez',
+        username: 'claudine.rodriguez',
+        pin: '1234',
+        name: 'Ms. Claudine May R. Rodriguez',
+        dept: 'English & Physical Education',
+        room: 'Room 7-A',
+        email: 'claudine.rodriguez@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "08:20", title: "English 7", room: "Room 7-A", type: "class", days: [1,2,3,4,5] },
+          { start: "08:20", end: "09:45", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "09:45", end: "11:45", title: "Creative Nonfiction 12 - HUMSS", room: "HUMSS 12", type: "class", days: [5] },
+          { start: "11:45", end: "12:00", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "13:50", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "13:50", end: "14:40", title: "MAPEH 10", room: "Gymnasium", type: "class", days: [1,2,3,4,5] },
+          { start: "14:40", end: "14:45", title: "Short Break", room: "Campus", type: "break", days: [1,2,3,4,5] },
+          { start: "14:45", end: "16:45", title: "Creative Nonfiction 12 - HUMSS", room: "HUMSS 12", type: "class", days: [3,4,5] },
+          { start: "16:45", end: "17:45", title: "PE and Health III 12", room: "Gymnasium", type: "class", days: [1,2] }
+        ]
+      },
+      {
+        id: 'mayuela',
+        username: 'jill.mayuela',
+        pin: '1234',
+        name: 'Ms. Jill Mayuela',
+        dept: 'Filipino & MAPEH',
+        room: 'Room 7-B',
+        email: 'jill.mayuela@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "09:10", title: "Vacant / Lesson Prep", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "09:10", end: "10:00", title: "Filipino 7", room: "Room 7-B", type: "class", days: [1,2,3,4,5] },
+          { start: "10:00", end: "11:10", title: "Break / Vacant", room: "Faculty Lounge", type: "vacant", days: [1,2,3,4,5] },
+          { start: "11:10", end: "12:00", title: "Filipino 8", room: "Room 8-B", type: "class", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "14:40", title: "Vacant / Office Time", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "14:40", end: "15:30", title: "MAPEH 7", room: "Gymnasium", type: "class", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'cadungog',
+        username: 'rowena.cadungog',
+        pin: '1234',
+        name: 'Mrs. Rowena R. Cadungog',
+        dept: 'Araling Panlipunan Department',
+        room: 'Room 10-B',
+        email: 'rowena.cadungog@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "10:20", title: "Vacant / Research", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "10:20", end: "11:10", title: "Araling Panlipunan 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
+          { start: "11:10", end: "12:00", title: "Araling Panlipunan 9", room: "Room 9-A", type: "class", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "13:50", title: "Araling Panlipunan 8", room: "Room 8-A", type: "class", days: [1,2,3,4,5] },
+          { start: "13:50", end: "16:30", title: "Vacant / Grading", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'culibra',
+        username: 'glenn.culibra',
+        pin: '1234',
+        name: 'Sr. Ma. Glenn N. Culibra, DST',
+        dept: 'Christian Living Formation (CLF)',
+        room: 'Chapel / Values Formation Room',
+        email: 'glenn.culibra@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "11:10", title: "Vacant / Pastoral Duties", room: "Pastoral Center", type: "vacant", days: [1,2,3,4,5] },
+          { start: "11:10", end: "12:00", title: "Christian Living Formation 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
+          { start: "12:00", end: "13:00", title: "Lunch Break", room: "Convent / Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "13:50", title: "Christian Living Formation 7", room: "Room 7-A", type: "class", days: [1,2,3,4,5] },
+          { start: "13:50", end: "14:40", title: "Christian Living Formation 8", room: "Room 8-A", type: "class", days: [1,2,3,4,5] },
+          { start: "14:40", end: "15:30", title: "Christian Living Formation 9", room: "Room 9-A", type: "class", days: [1,2,3,4,5] }
+        ]
+      },
+      {
+        id: 'anito',
+        username: 'nancy.anito',
+        pin: '1234',
+        name: 'Mrs. Nancy Anito',
+        dept: 'Filipino & Grade 7 Advisory',
+        room: 'Room 7-B',
+        email: 'nancy.anito@deped.gov.ph',
+        avatar: '',
+        periods: [
+          { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
+          { start: "07:30", end: "09:10", title: "Vacant / Office Time", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "09:10", end: "10:00", title: "Filipino 9", room: "Room 9-B", type: "class", days: [1,2,3,4,5] },
+          { start: "10:00", end: "11:20", title: "Vacant / Consultation", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "11:20", end: "12:20", title: "Pag-aaral sa Kasaysayan at Lipunang Filipino", room: "SHS Hall", type: "class", days: [1,2,3,4,5] },
+          { start: "12:20", end: "13:00", title: "Lunch Break", room: "Faculty Lounge", type: "break", days: [1,2,3,4,5] },
+          { start: "13:00", end: "13:50", title: "Filipino 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
+          { start: "13:50", end: "14:40", title: "Filipino 7", room: "Room 7-B", type: "class", days: [1,2,3,4,5] },
+          { start: "14:40", end: "15:30", title: "Vacant", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
+          { start: "15:30", end: "16:30", title: "Homeroom Guidance 7", room: "Room 7-B", type: "class", days: [1,2,3,4,5] }
+        ]
+      }
+    ];
+
+    // Master Principal Account
+    const PRINCIPAL_USER = {
+      role: 'principal',
+      username: 'principal',
+      pin: '1234',
+      name: 'School Principal',
+      title: 'Principal IV'
+    };
+
+    // 2. STATE STORAGE & PERSISTENCE
+    let faculty = [];
+    let currentUser = null; // null, { role: 'principal' }, or { role: 'teacher', teacherId: 'borla' }
+    let teacherActiveTab = 'timeline'; // 'timeline' or 'weekly'
+    let memoText = "Welcome to the School Year! Teachers may inspect and manage their individual timetable below.";
+    
+    // Simulation Clock State
+    let isSimulated = false;
+    let simDay = 5; // Friday default
+    let simMinutes = 8 * 60; // 08:00 AM default
+    let selectedPrincipalTeacherId = 'borla';
+    let tempImageBase64 = null;
+
+    function initData() {
+      const savedFaculty = localStorage.getItem('school_faculty_data_v2');
+      if (savedFaculty) {
+        try {
+          faculty = JSON.parse(savedFaculty);
+        } catch (e) {
+          faculty = JSON.parse(JSON.stringify(DEFAULT_FACULTY));
+        }
+      } else {
+        faculty = JSON.parse(JSON.stringify(DEFAULT_FACULTY));
+      }
+
+      const savedMemo = localStorage.getItem('school_principal_memo');
+      if (savedMemo !== null) {
+        memoText = savedMemo;
+      }
+
+      const savedUser = localStorage.getItem('school_auth_session');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+        } catch (e) {
+          currentUser = null;
+        }
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem('school_faculty_data_v2', JSON.stringify(faculty));
+    }
+
+    function saveSession() {
+      if (currentUser) {
+        localStorage.setItem('school_auth_session', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('school_auth_session');
+      }
+    }
+
+    // 3. CLOCK & TIME FUNCTIONS
+    function getCurrentDayAndMinutes() {
+      if (isSimulated) {
+        return { day: simDay, minutes: simMinutes };
+      }
+      const now = new Date();
+      return {
+        day: now.getDay(),
+        minutes: now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60
+      };
+    }
+
+    function formatTimeMinutes(minutesTotal) {
+      let m = Math.floor(minutesTotal);
+      let hrs = Math.floor(m / 60);
+      let mins = m % 60;
+      let ampm = hrs >= 12 ? 'PM' : 'AM';
+      let displayHrs = hrs % 12 || 12;
+      return `${displayHrs}:${mins < 10 ? '0' + mins : mins} ${ampm}`;
+    }
+
+    function parseTimeToMinutes(str) {
+      const [h, m] = str.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function updateNavClock() {
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const navDay = document.getElementById('nav-day-name');
+      const navClock = document.getElementById('nav-clock');
+
+      if (isSimulated) {
+        navDay.textContent = dayNames[simDay] + " (Simulated)";
+        navClock.textContent = formatTimeMinutes(simMinutes);
+      } else {
+        const now = new Date();
+        navDay.textContent = dayNames[now.getDay()];
+        navClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+
+      // Refresh live cards if views are active
+      if (currentUser) {
+        if (currentUser.role === 'teacher') {
+          renderTeacherDashboard();
+        } else if (currentUser.role === 'principal') {
+          renderPrincipalMonitorGrid();
+        }
+      }
+    }
+
+    setInterval(updateNavClock, 1000);
+
+    // 4. AUTHENTICATION CONTROLLER (ISOLATION CORE)
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
+      const pinInput = document.getElementById('login-pin').value.trim();
+      const errorBox = document.getElementById('login-error');
+
+      // Check if Principal
+      if (usernameInput === PRINCIPAL_USER.username) {
+        const savedPrincipalPin = localStorage.getItem('school_principal_pin') || PRINCIPAL_USER.pin;
+        if (pinInput === savedPrincipalPin) {
+          currentUser = { role: 'principal' };
+          saveSession();
+          renderApp();
+          return;
+        }
+      }
+
+      // Check Teachers
+      const teacher = faculty.find(t => t.username.toLowerCase() === usernameInput);
+      if (teacher) {
+        if (teacher.pin === pinInput) {
+          currentUser = { role: 'teacher', teacherId: teacher.id };
+          saveSession();
+          renderApp();
+          return;
+        }
+      }
+
+      errorBox.textContent = "Invalid username or PIN. Please check your credentials.";
+      errorBox.classList.remove('hidden');
+    }
+
+    function logout() {
+      currentUser = null;
+      saveSession();
+      renderApp();
+    }
+
+    function quickLogin(username) {
+      if (username === 'principal') {
+        currentUser = { role: 'principal' };
+      } else {
+        const t = faculty.find(f => f.username === username);
+        if (t) {
+          currentUser = { role: 'teacher', teacherId: t.id };
+        }
+      }
+      saveSession();
+      closeCredentialsModal();
+      renderApp();
+    }
+
+    // 5. RENDERING THE CORE VIEWS ACCORDING TO ROLES
+    function renderApp() {
+      const loginView = document.getElementById('view-login');
+      const teacherView = document.getElementById('view-teacher-dashboard');
+      const principalView = document.getElementById('view-principal-dashboard');
+      const authNav = document.getElementById('auth-nav-container');
+      const roleBadge = document.getElementById('role-badge');
+      const announcementBanner = document.getElementById('announcement-banner');
+      const announcementText = document.getElementById('announcement-text');
+
+      // Update Announcement
+      if (memoText && memoText.trim() !== '') {
+        announcementText.textContent = memoText;
+        announcementBanner.classList.remove('hidden');
+      } else {
+        announcementBanner.classList.add('hidden');
+      }
+
+      if (!currentUser) {
+        // Not logged in -> Show login box only
+        loginView.classList.remove('hidden');
+        teacherView.classList.add('hidden');
+        principalView.classList.add('hidden');
+        roleBadge.textContent = 'Not Logged In';
+        roleBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400';
+        authNav.innerHTML = `
+          <button onclick="document.getElementById('login-username').focus()" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm flex items-center gap-1.5">
+            <i class="ph ph-sign-in"></i>
+            <span>Teacher Login</span>
+          </button>
+        `;
+        return;
+      }
+
+      loginView.classList.add('hidden');
+
+      if (currentUser.role === 'teacher') {
+        // STRICT TEACHER ISOLATION: Show ONLY the teacher dashboard
+        const currentTeacher = faculty.find(t => t.id === currentUser.teacherId);
+        if (!currentTeacher) {
+          logout();
+          return;
+        }
+
+        teacherView.classList.remove('hidden');
+        principalView.classList.add('hidden');
+
+        roleBadge.textContent = 'Teacher Account';
+        roleBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+
+        authNav.innerHTML = `
+          <div class="flex items-center gap-2">
+            <div class="hidden sm:flex flex-col text-right">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-100">${escapeHtml(currentTeacher.name)}</span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">@${escapeHtml(currentTeacher.username)}</span>
+            </div>
+            <button onclick="logout()" title="Sign Out" class="p-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-slate-700 transition">
+              <i class="ph-bold ph-sign-out text-base"></i>
+            </button>
+          </div>
+        `;
+
+        renderTeacherDashboard();
+
+      } else if (currentUser.role === 'principal') {
+        // MASTER PRINCIPAL VIEW: Show Campus-wide dashboard
+        teacherView.classList.add('hidden');
+        principalView.classList.remove('hidden');
+
+        roleBadge.textContent = 'Principal Master';
+        roleBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300';
+
+        authNav.innerHTML = `
+          <div class="flex items-center gap-2">
+            <div class="hidden sm:flex flex-col text-right">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-100">School Principal</span>
+              <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Superuser Access</span>
+            </div>
+            <button onclick="logout()" title="Sign Out" class="p-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-slate-700 transition">
+              <i class="ph-bold ph-sign-out text-base"></i>
+            </button>
+          </div>
+        `;
+
+        renderPrincipalDashboard();
+      }
+    }
+
+    // 6. TEACHER DASHBOARD LOGIC (ISOLATED VIEW)
+    function renderTeacherDashboard() {
+      const teacher = faculty.find(t => t.id === currentUser.teacherId);
+      if (!teacher) return;
+
+      // Populate Hero Banner
+      document.getElementById('teacher-hero-name').textContent = teacher.name;
+      document.getElementById('teacher-hero-dept').textContent = teacher.dept;
+      document.getElementById('teacher-hero-room').innerHTML = `<i class="ph ph-map-pin"></i> ${escapeHtml(teacher.room || 'Assigned Room')}`;
+      document.getElementById('teacher-hero-email').innerHTML = `<i class="ph ph-envelope"></i> ${escapeHtml(teacher.email || 'deped.gov.ph')}`;
+
+      const avatarContainer = document.getElementById('teacher-hero-avatar');
+      if (teacher.avatar) {
+        avatarContainer.style.backgroundImage = `url('${teacher.avatar}')`;
+        avatarContainer.textContent = '';
+      } else {
+        avatarContainer.style.backgroundImage = 'none';
+        avatarContainer.textContent = getInitials(teacher.name);
+      }
+
+      // Populate Live Pulse
+      const { day, minutes } = getCurrentDayAndMinutes();
+      const currentPeriod = getActivePeriodForTeacher(teacher, day, minutes);
+      const liveBox = document.getElementById('teacher-live-indicator');
+
+      if (day === 0 || day === 6) {
+        liveBox.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-xl font-bold">
+              <i class="ph ph-calendar-x"></i>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-500 dark:text-slate-400">Campus Status</div>
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200">Weekend - Campus is Closed</div>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400">No active classes scheduled today.</div>
+        `;
+      } else if (currentPeriod) {
+        const startMin = parseTimeToMinutes(currentPeriod.start);
+        const endMin = parseTimeToMinutes(currentPeriod.end);
+        const progressPct = Math.min(100, Math.max(0, Math.round(((minutes - startMin) / (endMin - startMin)) * 100)));
+        const remainMins = Math.max(0, Math.ceil(endMin - minutes));
+
+        const isClass = currentPeriod.type === 'class';
+        const colorClass = isClass ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400';
+        const bgIcon = isClass ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-600';
+
+        liveBox.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl ${bgIcon} flex items-center justify-center text-xl font-bold">
+              <i class="ph-fill ${isClass ? 'ph-chalkboard-teacher' : 'ph-coffee'}"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] uppercase font-bold tracking-wider ${colorClass}">Ongoing Now</span>
+                <span class="text-xs text-slate-400">• ${remainMins} min remaining</span>
+              </div>
+              <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(currentPeriod.title)}</div>
+              <div class="text-xs text-slate-500">${formatTimeMinutes(startMin)} – ${formatTimeMinutes(endMin)} | ${escapeHtml(currentPeriod.room || 'Campus')}</div>
+            </div>
+          </div>
+
+          <div class="w-full sm:w-48 space-y-1">
+            <div class="flex justify-between text-[11px] text-slate-500 font-medium">
+              <span>Progress</span>
+              <span>${progressPct}%</span>
+            </div>
+            <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: ${progressPct}%"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        liveBox.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-xl font-bold">
+              <i class="ph ph-moon"></i>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-500 dark:text-slate-400">Class Hours Status</div>
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200">No Class in Session Right Now</div>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400">Review your agenda or prepare for your next lecture.</div>
+        `;
+      }
+
+      // Populate View Tab Content
+      if (teacherActiveTab === 'timeline') {
+        renderTeacherTimeline(teacher, day, minutes);
+      } else {
+        renderTeacherWeekly(teacher);
+      }
+    }
+
+    function setTeacherViewTab(tab) {
+      teacherActiveTab = tab;
+      const tabTimelineBtn = document.getElementById('tab-btn-timeline');
+      const tabWeeklyBtn = document.getElementById('tab-btn-weekly');
+      const timelineView = document.getElementById('teacher-view-timeline');
+      const weeklyView = document.getElementById('teacher-view-weekly');
+
+      if (tab === 'timeline') {
+        tabTimelineBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition';
+        tabWeeklyBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition';
+        timelineView.classList.remove('hidden');
+        weeklyView.classList.add('hidden');
+      } else {
+        tabWeeklyBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition';
+        tabTimelineBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition';
+        weeklyView.classList.remove('hidden');
+        timelineView.classList.add('hidden');
+      }
+      renderTeacherDashboard();
+    }
+
+    function renderTeacherTimeline(teacher, day, currentMinutes) {
+      const container = document.getElementById('teacher-view-timeline');
+      const activeDay = (day >= 1 && day <= 5) ? day : 5; // fallback to Friday if weekend
+      const dayPeriods = teacher.periods.filter(p => p.days.includes(activeDay));
+
+      if (dayPeriods.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 bg-white dark:bg-slate-900 rounded-2xl">No periods scheduled for this day.</div>`;
+        return;
+      }
+
+      // Sort by start time
+      dayPeriods.sort((a, b) => parseTimeToMinutes(a.start) - parseTimeToMinutes(b.start));
+
+      container.innerHTML = dayPeriods.map((p, idx) => {
+        const startMin = parseTimeToMinutes(p.start);
+        const endMin = parseTimeToMinutes(p.end);
+        const isOngoing = (day === activeDay) && (currentMinutes >= startMin && currentMinutes < endMin);
+        const isPast = (day === activeDay) && (currentMinutes >= endMin);
+
+        let borderStyle = isOngoing 
+          ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20 ring-1 ring-emerald-500' 
+          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900';
+
+        let badge = '';
+        if (p.type === 'class') {
+          badge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Class</span>`;
+        } else if (p.type === 'break') {
+          badge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">Break</span>`;
+        } else {
+          badge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">Vacant</span>`;
+        }
+
+        return `
+          <div class="print-card rounded-2xl p-4 border transition-all ${borderStyle} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${isOngoing ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}">
+                ${idx + 1}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(p.title)}</h4>
+                  ${badge}
+                  ${isOngoing ? '<span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider animate-pulse">Active</span>' : ''}
+                </div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-3">
+                  <span><i class="ph ph-clock"></i> ${formatTimeMinutes(startMin)} – ${formatTimeMinutes(endMin)}</span>
+                  <span>•</span>
+                  <span><i class="ph ph-map-pin"></i> ${escapeHtml(p.room || 'Room')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-auto no-print">
+              <button onclick="openEditPeriodModal('${teacher.id}', ${teacher.periods.indexOf(p)})" class="p-2 text-xs rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Edit Period">
+                <i class="ph-bold ph-pencil-simple"></i>
+              </button>
+              <button onclick="deletePeriod('${teacher.id}', ${teacher.periods.indexOf(p)})" class="p-2 text-xs rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition" title="Delete Period">
+                <i class="ph-bold ph-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTeacherWeekly(teacher) {
+      const tbody = document.getElementById('teacher-weekly-matrix-body');
+      
+      // Extract unique time slots
+      const slotMap = new Map();
+      teacher.periods.forEach(p => {
+        const key = `${p.start}-${p.end}`;
+        if (!slotMap.has(key)) {
+          slotMap.set(key, { start: p.start, end: p.end });
+        }
+      });
+
+      const sortedSlots = Array.from(slotMap.values()).sort((a, b) => parseTimeToMinutes(a.start) - parseTimeToMinutes(b.start));
+
+      if (sortedSlots.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No schedule slots configured.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sortedSlots.map(slot => {
+        const startMin = parseTimeToMinutes(slot.start);
+        const endMin = parseTimeToMinutes(slot.end);
+
+        const daysHtml = [1, 2, 3, 4, 5].map(d => {
+          const match = teacher.periods.find(p => p.start === slot.start && p.end === slot.end && p.days.includes(d));
+          if (!match) {
+            return `<td class="py-2.5 px-3 bg-slate-50/50 dark:bg-slate-900/40 text-slate-400 text-center">-</td>`;
+          }
+
+          let style = 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 border border-emerald-200/60 dark:border-emerald-800/60';
+          if (match.type === 'break') {
+            style = 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-200/60 dark:border-amber-800/60';
+          } else if (match.type === 'vacant') {
+            style = 'bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400';
+          }
+
+          return `
+            <td class="py-2 px-2.5 align-top">
+              <div class="p-2 rounded-xl ${style} text-left">
+                <div class="font-bold text-[11px] leading-snug">${escapeHtml(match.title)}</div>
+                <div class="text-[10px] opacity-75 mt-0.5"><i class="ph ph-map-pin"></i> ${escapeHtml(match.room || '')}</div>
+              </div>
+            </td>
+          `;
+        }).join('');
+
+        return `
+          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
+            <td class="py-3 px-4 font-mono font-semibold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap">
+              ${formatTimeMinutes(startMin)}<br>
+              <span class="text-[10px] text-slate-400 font-normal">to ${formatTimeMinutes(endMin)}</span>
+            </td>
+            ${daysHtml}
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 7. PRINCIPAL MASTER DASHBOARD LOGIC
+    function renderPrincipalDashboard() {
+      // 1. Populate Teacher Dropdown in Principal Area
+      const select = document.getElementById('principal-teacher-select');
+      select.innerHTML = faculty.map(t => `
+        <option value="${t.id}" ${t.id === selectedPrincipalTeacherId ? 'selected' : ''}>
+          ${escapeHtml(t.name)}
+        </option>
+      `).join('');
+
+      renderPrincipalMonitorGrid();
+      renderPrincipalSelectedTeacherSchedule();
+    }
+
+    function renderPrincipalMonitorGrid() {
+      const container = document.getElementById('principal-faculty-grid');
+      const countBadge = document.getElementById('principal-live-count');
+      const { day, minutes } = getCurrentDayAndMinutes();
+
+      let activeClassCount = 0;
+
+      container.innerHTML = faculty.map(teacher => {
+        const activePeriod = getActivePeriodForTeacher(teacher, day, minutes);
+        const isTeaching = activePeriod && activePeriod.type === 'class';
+        if (isTeaching) activeClassCount++;
+
+        let statusText = 'Vacant / Not in Session';
+        let statusBadge = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+        let roomText = teacher.room;
+
+        if (activePeriod) {
+          statusText = activePeriod.title;
+          roomText = activePeriod.room || teacher.room;
+          if (activePeriod.type === 'class') {
+            statusBadge = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300/40';
+          } else if (activePeriod.type === 'break') {
+            statusBadge = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+          }
+        }
+
+        return `
+          <div onclick="inspectTeacherByPrincipal('${teacher.id}')" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:border-indigo-400 transition cursor-pointer">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-slate-300 dark:bg-slate-700 flex items-center justify-center font-bold text-xs text-slate-800 dark:text-slate-100 overflow-hidden bg-cover bg-center" style="${teacher.avatar ? `background-image: url('${teacher.avatar}')` : ''}">
+                  ${teacher.avatar ? '' : getInitials(teacher.name)}
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-slate-900 dark:text-white leading-tight">${escapeHtml(teacher.name)}</div>
+                  <div class="text-[10px] text-slate-500 font-mono">@${escapeHtml(teacher.username)}</div>
+                </div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${statusBadge}">
+                ${isTeaching ? 'Teaching' : 'Idle'}
+              </span>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
+              <span class="font-medium truncate max-w-[170px] text-slate-700 dark:text-slate-200">${escapeHtml(statusText)}</span>
+              <span class="text-slate-400 text-[10px]"><i class="ph ph-map-pin"></i> ${escapeHtml(roomText)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      countBadge.textContent = `${activeClassCount}/12 Teachers Currently in Class`;
+    }
+
+    function inspectTeacherByPrincipal(teacherId) {
+      selectedPrincipalTeacherId = teacherId;
+      document.getElementById('principal-teacher-select').value = teacherId;
+      renderPrincipalSelectedTeacherSchedule();
+    }
+
+    function handlePrincipalTeacherChange() {
+      selectedPrincipalTeacherId = document.getElementById('principal-teacher-select').value;
+      renderPrincipalSelectedTeacherSchedule();
+    }
+
+    function renderPrincipalSelectedTeacherSchedule() {
+      const container = document.getElementById('principal-selected-teacher-container');
+      const teacher = faculty.find(t => t.id === selectedPrincipalTeacherId);
+      if (!teacher) return;
+
+      container.innerHTML = `
+        <div class="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm overflow-hidden bg-cover bg-center" style="${teacher.avatar ? `background-image: url('${teacher.avatar}')` : ''}">
+              ${teacher.avatar ? '' : getInitials(teacher.name)}
+            </div>
+            <div>
+              <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(teacher.name)} (${escapeHtml(teacher.dept)})</div>
+              <div class="text-xs text-slate-500">Username: <code class="font-mono text-indigo-600 dark:text-indigo-400">@${escapeHtml(teacher.username)}</code> | PIN: <code class="font-mono font-bold">${escapeHtml(teacher.pin)}</code></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openPrincipalEditTeacherModal('${teacher.id}')" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100">
+              Edit Teacher Info
+            </button>
+            <button onclick="openAddPeriodModalForTeacher('${teacher.id}')" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-sm">
+              + Add Period
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          ${teacher.periods.map((p, idx) => `
+            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-3">
+                <span class="font-mono font-bold text-slate-600 dark:text-slate-300">${formatTimeMinutes(parseTimeToMinutes(p.start))} -${formatTimeMinutes(parseTimeToMinutes(p.end))}</span>
+                <span class="font-bold text-slate-900 dark:text-white">${escapeHtml(p.title)}</span>
+                <span class="text-slate-400">(${escapeHtml(p.room || 'Room')})</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${p.type === 'class' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-600'}">${p.type}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button onclick="openEditPeriodModal('${teacher.id}',${idx})" class="p-1.5 text-slate-500 hover:text-slate-800" title="Edit Period"><i class="ph ph-pencil"></i></button>
+                <button onclick="deletePeriod('${teacher.id}',${idx})" class="p-1.5 text-rose-500 hover:text-rose-700" title="Delete Period"><i class="ph ph-trash"></i></button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // 8. PERIOD EDIT / DELETE MODAL HANDLERS
+    function openAddPeriodModal() {
+      if (!currentUser || currentUser.role !== 'teacher') return;
+      openAddPeriodModalForTeacher(currentUser.teacherId);
+    }
+
+    function openAddPeriodModalForTeacher(teacherId) {
+      document.getElementById('modal-period-title').textContent = 'Add Schedule Period';
+      document.getElementById('period-index-input').value = '-1';
+      document.getElementById('period-teacher-id-input').value = teacherId;
+      document.getElementById('period-name-input').value = '';
+      document.getElementById('period-start-input').value = '07:30';
+      document.getElementById('period-end-input').value = '08:20';
+      document.getElementById('period-room-input').value = '';
+      document.getElementById('period-type-input').value = 'class';
+      
+      const dayCheckboxes = document.querySelectorAll('input[name="period-day"]');
+      dayCheckboxes.forEach(cb => cb.checked = true);
+
+      document.getElementById('modal-period').classList.remove('hidden');
+    }
+
+    function openEditPeriodModal(teacherId, index) {
+      const teacher = faculty.find(t => t.id === teacherId);
+      if (!teacher || !teacher.periods[index]) return;
+
+      const p = teacher.periods[index];
+      document.getElementById('modal-period-title').textContent = 'Edit Schedule Period';
+      document.getElementById('period-index-input').value = index;
+      document.getElementById('period-teacher-id-input').value = teacherId;
+      document.getElementById('period-name-input').value = p.title;
+      document.getElementById('period-start-input').value = p.start;
+      document.getElementById('period-end-input').value = p.end;
+      document.getElementById('period-room-input').value = p.room || '';
+      document.getElementById('period-type-input').value = p.type || 'class';
+
+      const dayCheckboxes = document.querySelectorAll('input[name="period-day"]');
+      dayCheckboxes.forEach(cb => {
+        cb.checked = p.days.includes(parseInt(cb.value));
+      });
+
+      document.getElementById('modal-period').classList.remove('hidden');
+    }
+
+    function closePeriodModal() {
+      document.getElementById('modal-period').classList.add('hidden');
+    }
+
+    function handlePeriodSave(e) {
+      e.preventDefault();
+      const teacherId = document.getElementById('period-teacher-id-input').value;
+      const index = parseInt(document.getElementById('period-index-input').value);
+      const teacher = faculty.find(t => t.id === teacherId);
+      if (!teacher) return;
+
+      const dayCheckboxes = document.querySelectorAll('input[name="period-day"]:checked');
+      const selectedDays = Array.from(dayCheckboxes).map(cb => parseInt(cb.value));
+
+      if (selectedDays.length === 0) {
+        alert("Please select at least one day for this period.");
+        return;
+      }
+
+      const newPeriod = {
+        title: document.getElementById('period-name-input').value.trim(),
+        start: document.getElementById('period-start-input').value,
+        end: document.getElementById('period-end-input').value,
+        room: document.getElementById('period-room-input').value.trim(),
+        type: document.getElementById('period-type-input').value,
+        days: selectedDays
+      };
+
+      if (index === -1) {
+        teacher.periods.push(newPeriod);
+      } else {
+        teacher.periods[index] = newPeriod;
+      }
+
+      saveData();
+      closePeriodModal();
+      renderApp();
+    }
+
+    function deletePeriod(teacherId, index) {
+      if (!confirm("Are you sure you want to delete this period?")) return;
+      const teacher = faculty.find(t => t.id === teacherId);
+      if (!teacher) return;
+
+      teacher.periods.splice(index, 1);
+      saveData();
+      renderApp();
+    }
+
+    // 9. PROFILE & PHOTO EDITING LOGIC
+    function openEditProfileModal() {
+      if (!currentUser || currentUser.role !== 'teacher') return;
+      openPrincipalEditTeacherModal(currentUser.teacherId);
+    }
+
+    function openPrincipalEditTeacherModal(teacherId) {
+      const teacher = faculty.find(t => t.id === teacherId);
+      if (!teacher) return;
+
+      tempImageBase64 = teacher.avatar || null;
+      document.getElementById('profile-name-input').value = teacher.name;
+      document.getElementById('profile-dept-input').value = teacher.dept;
+      document.getElementById('profile-room-input').value = teacher.room || '';
+      document.getElementById('profile-pin-input').value = '';
+
+      updateProfilePreviewAvatar(teacher.name, tempImageBase64);
+      document.getElementById('edit-profile-form').dataset.teacherId = teacherId;
+      document.getElementById('modal-edit-profile').classList.remove('hidden');
+    }
+
+    function updateProfilePreviewAvatar(name, avatarUrl) {
+      const el = document.getElementById('profile-preview-avatar');
+      if (avatarUrl) {
+        el.style.backgroundImage = `url('${avatarUrl}')`;
+        el.textContent = '';
+      } else {
+        el.style.backgroundImage = 'none';
+        el.textContent = getInitials(name || 'T');
+      }
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('modal-edit-profile').classList.add('hidden');
+      tempImageBase64 = null;
+    }
+
+    function handleImageFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        // Compress & resize image via HTML5 Canvas
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 320;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          tempImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          updateProfilePreviewAvatar(document.getElementById('profile-name-input').value, tempImageBase64);
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearProfilePhoto() {
+      tempImageBase64 = '';
+      document.getElementById('profile-file-input').value = '';
+      updateProfilePreviewAvatar(document.getElementById('profile-name-input').value, '');
+    }
+
+    function handleProfileSave(e) {
+      e.preventDefault();
+      const teacherId = e.target.dataset.teacherId;
+      const teacher = faculty.find(t => t.id === teacherId);
+      if (!teacher) return;
+
+      teacher.name = document.getElementById('profile-name-input').value.trim();
+      teacher.dept = document.getElementById('profile-dept-input').value.trim();
+      teacher.room = document.getElementById('profile-room-input').value.trim();
+      
+      const newPin = document.getElementById('profile-pin-input').value.trim();
+      if (newPin) {
+        teacher.pin = newPin;
+      }
+
+      if (tempImageBase64 !== null) {
+        teacher.avatar = tempImageBase64;
+      }
+
+      saveData();
+      closeEditProfileModal();
+      renderApp();
+    }
+
+    // 10. PRINCIPAL MEMO BROADCAST
+    function openBroadcastMemoModal() {
+      document.getElementById('memo-text-input').value = memoText;
+      document.getElementById('modal-memo').classList.remove('hidden');
+    }
+
+    function closeBroadcastMemoModal() {
+      document.getElementById('modal-memo').classList.add('hidden');
+    }
+
+    function handleMemoSave(e) {
+      e.preventDefault();
+      memoText = document.getElementById('memo-text-input').value.trim();
+      localStorage.setItem('school_principal_memo', memoText);
+      closeBroadcastMemoModal();
+      renderApp();
+    }
+
+    function clearMemo() {
+      memoText = '';
+      localStorage.removeItem('school_principal_memo');
+      closeBroadcastMemoModal();
+      renderApp();
+    }
+
+    function dismissAnnouncement() {
+      document.getElementById('announcement-banner').classList.add('hidden');
+    }
+
+    // 11. CREDENTIALS MODAL BUILDER
+    function openCredentialsModal() {
+      const list = document.getElementById('credentials-list');
+      list.innerHTML = faculty.map(t => `
+        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
+          <div>
+            <div class="font-bold text-slate-800 dark:text-slate-200">${escapeHtml(t.name)}</div>
+            <div class="text-[11px] text-slate-500">
+              Username: <code class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">${escapeHtml(t.username)}</code>
+              &nbsp;|&nbsp; PIN: <code class="font-mono font-bold">${escapeHtml(t.pin)}</code>
+            </div>
+          </div>
+          <button onclick="quickLogin('${t.username}')" class="px-2.5 py-1 text-xs rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition">
+            Login
+          </button>
+        </div>
+      `).join('');
+      document.getElementById('modal-credentials').classList.remove('hidden');
+    }
+
+    function closeCredentialsModal() {
+      document.getElementById('modal-credentials').classList.add('hidden');
+    }
+
+    // 12. TIME SIMULATOR CONTROLS
+    function toggleSimDrawer() {
+      const drawer = document.getElementById('sim-drawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function applySimulation() {
+      const dayVal = parseInt(document.getElementById('sim-day-select').value);
+      const timeVal = document.getElementById('sim-time-input').value;
+      if (!timeVal) return;
+
+      isSimulated = true;
+      simDay = dayVal;
+      simMinutes = parseTimeToMinutes(timeVal);
+      updateNavClock();
+    }
+
+    function resetSimulation() {
+      isSimulated = false;
+      document.getElementById('sim-drawer').classList.add('hidden');
+      updateNavClock();
+    }
+
+    // 13. HELPER UTILITIES
+    function getActivePeriodForTeacher(teacher, day, currentMinutes) {
+      if (day < 1 || day > 5) return null;
+      return teacher.periods.find(p => {
+        if (!p.days.includes(day)) return false;
+        const s = parseTimeToMinutes(p.start);
+        const e = parseTimeToMinutes(p.end);
+        return currentMinutes >= s && currentMinutes < e;
+      }) || null;
+    }
+
+    function getInitials(name) {
+      return name
+        .replace(/(Mr\.|Ms\.|Mrs\.|Sr\.)/g, '')
+        .trim()
+        .split(' ')
+        .filter(n => n.length > 0)
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', () => {
+      initData();
+      renderApp();
+      updateNavClock();
+    });
+  </script>
+</body>
+</html>
