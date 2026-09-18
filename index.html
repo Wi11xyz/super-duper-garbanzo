@@ -32,31 +32,39 @@
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      body { background: white !important; color: black !important; font-size: 11pt; }
+      body { background: white !important; color: black !important; font-size: 10pt; }
       .print-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; break-inside: avoid; }
     }
     .print-only { display: none; }
+    /* Custom scrollbars for data tables */
+    ::-webkit-scrollbar { height: 6px; width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
   </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans antialiased transition-colors">
 
   <!-- ================= TOP NAVIGATION BAR ================= -->
-  <header class="no-print sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <header class="no-print sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      
+      <!-- Brand & School Logo -->
       <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md font-bold text-xl">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 font-bold text-xl flex-shrink-0">
           <i class="ph-bold ph-graduation-cap"></i>
         </div>
         <div>
-          <h1 class="text-base font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-2">
-            Faculty & School Suite
+          <h1 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+            School Portal Suite
             <span id="role-badge" class="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
               Not Logged In
             </span>
           </h1>
-          <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <span>Timetable • Attendance • Grades • DLPs</span>
-            <span>•</span>
+          <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+            <span class="hidden sm:inline">Schedule • Grades • Attendance • DLPs</span>
+            <span class="hidden sm:inline">•</span>
+            <!-- Cloud Connection Status Indicator -->
             <span id="cloud-sync-status" class="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Connecting to Cloud...</span>
@@ -65,7 +73,8 @@
         </div>
       </div>
 
-      <div class="hidden md:flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700/80 text-xs">
+      <!-- Live Clock & Status Bar -->
+      <div class="hidden lg:flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700/80 text-xs">
         <div class="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -79,26 +88,30 @@
         </div>
       </div>
 
+      <!-- Action Utilities & Auth Controls -->
       <div class="flex items-center gap-2">
         <button id="btn-toggle-sim" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center gap-1.5 transition">
           <i class="ph ph-sliders"></i>
-          <span class="hidden sm:inline">Simulate</span>
+          <span class="hidden md:inline">Simulate Time</span>
         </button>
+
         <button id="btn-open-credentials" class="px-2.5 py-1.5 text-xs rounded-lg border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 transition flex items-center gap-1.5">
           <i class="ph-bold ph-key"></i>
-          <span class="hidden sm:inline">Accounts & PINs</span>
+          <span class="hidden md:inline">Accounts & PINs</span>
         </button>
+
+        <!-- Profile / Sign In Container -->
         <div id="auth-nav-container"></div>
       </div>
     </div>
   </header>
 
   <!-- ================= ANNOUNCEMENT BANNER ================= -->
-  <div id="announcement-banner" class="no-print hidden bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 px-4 py-2.5 text-xs text-amber-800 dark:text-amber-200">
+  <div id="announcement-banner" class="no-print hidden bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 px-4 py-2 text-xs text-amber-800 dark:text-amber-200">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 font-medium">
-        <i class="ph-fill ph-megaphone-simple text-amber-600 dark:text-amber-400 text-base"></i>
-        <span id="announcement-text">School Principal Memo: All teachers please check schedules and lesson plans.</span>
+        <i class="ph-fill ph-megaphone-simple text-amber-600 dark:text-amber-400 text-base flex-shrink-0"></i>
+        <span id="announcement-text">School Principal Memo: All teachers please check final examination schedules.</span>
       </div>
       <button id="btn-dismiss-announcement" class="text-amber-600 dark:text-amber-400 hover:text-amber-800 text-sm p-0.5">
         <i class="ph ph-x"></i>
@@ -112,6 +125,7 @@
       <div class="flex items-center gap-2">
         <i class="ph-bold ph-clock-countdown text-emerald-400 text-base"></i>
         <span class="font-semibold">Schedule Time Machine:</span>
+        <span class="text-slate-400">Test schedules at any time/day</span>
       </div>
       <div class="flex items-center flex-wrap gap-2">
         <select id="sim-day-select" class="bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-white">
@@ -124,8 +138,8 @@
           <option value="0">Sunday</option>
         </select>
         <input type="time" id="sim-time-input" value="08:00" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-        <button id="btn-apply-sim" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-medium">Apply</button>
-        <button id="btn-reset-sim" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded font-medium">Live Real Time</button>
+        <button id="btn-apply-sim" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-medium transition">Apply</button>
+        <button id="btn-reset-sim" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded font-medium transition">Live Real Time</button>
       </div>
     </div>
   </div>
@@ -139,9 +153,9 @@
         <div class="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-emerald-500/30 mb-4">
           <i class="ph-bold ph-lock-key"></i>
         </div>
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Sign In to Your Portal</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Sign In to School Portal</h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">
-          Access your personalized timetable, submit DLPs, record attendance, and manage student grades.
+          Teachers access their isolated schedule, advisory attendance, e-class record, and DLPs. Principal has master campus access.
         </p>
 
         <form id="login-form" class="space-y-4 text-left">
@@ -165,7 +179,7 @@
 
           <div id="login-error" class="hidden p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs text-center font-medium"></div>
 
-          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2">
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md shadow-emerald-600/30 transition flex items-center justify-center gap-2">
             <span>Sign In Securely</span>
             <i class="ph-bold ph-arrow-right"></i>
           </button>
@@ -179,10 +193,10 @@
       </div>
     </section>
 
-    <!-- 2. TEACHER ISOLATED DASHBOARD -->
+    <!-- 2. TEACHER ISOLATED DASHBOARD (Multi-Module Suite) -->
     <section id="view-teacher-dashboard" class="hidden space-y-6">
 
-      <!-- Hero Banner -->
+      <!-- Teacher Identity Hero Banner -->
       <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="flex items-center gap-4">
@@ -196,7 +210,7 @@
             <div>
               <div class="flex items-center gap-2">
                 <h2 id="teacher-hero-name" class="text-2xl font-bold tracking-tight">Teacher Name</h2>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">Teacher Portal</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">Faculty Access</span>
               </div>
               <p id="teacher-hero-dept" class="text-sm text-emerald-100/80">Department & Advisory</p>
               <div class="flex items-center gap-3 mt-2 text-xs text-emerald-200/70">
@@ -207,10 +221,11 @@
             </div>
           </div>
 
+          <!-- Quick Actions -->
           <div class="flex flex-wrap items-center gap-2">
             <button id="btn-open-edit-profile" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
               <i class="ph-bold ph-user-gear"></i>
-              <span>Profile & PIN</span>
+              <span>Edit Profile & Photo</span>
             </button>
             <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
               <i class="ph ph-printer"></i>
@@ -220,35 +235,45 @@
         </div>
       </div>
 
-      <!-- MAIN SUITE NAVIGATION TABS -->
-      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 no-print">
-        <button id="suite-tab-timetable" class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5">
+      <!-- MAIN SUITE MODULE TABS -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <button id="suite-tab-schedule" class="suite-tab-btn active px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5">
           <i class="ph-bold ph-calendar"></i>
-          <span>Schedule & Timetable</span>
+          <span>Schedule & Classes</span>
         </button>
-        <button id="suite-tab-dlp" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5">
+        <button id="suite-tab-attendance" class="suite-tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5">
+          <i class="ph-bold ph-check-square-offset"></i>
+          <span>Daily Attendance</span>
+        </button>
+        <button id="suite-tab-grades" class="suite-tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5">
+          <i class="ph-bold ph-chart-bar"></i>
+          <span>E-Class Record (Grades)</span>
+        </button>
+        <button id="suite-tab-dlp" class="suite-tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5">
           <i class="ph-bold ph-notebook"></i>
           <span>Daily Lesson Plans (DLP)</span>
         </button>
       </div>
 
-      <!-- SUBVIEW 1: TIMETABLE -->
-      <div id="subview-timetable" class="space-y-6">
+      <!-- ================= MODULE 1: SCHEDULE & TIMETABLE ================= -->
+      <div id="module-container-schedule" class="space-y-6">
+        <!-- Live Pulse Bar -->
         <div id="teacher-live-indicator" class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         </div>
 
+        <!-- Schedule Mode Sub-tabs -->
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div class="flex items-center gap-2">
-            <button id="tab-btn-timeline" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition">
+            <button id="tab-btn-timeline" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition">
               Today's Timeline
             </button>
-            <button id="tab-btn-weekly" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition">
+            <button id="tab-btn-weekly" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition">
               Full Weekly Matrix (Mon - Fri)
             </button>
           </div>
-          <button id="btn-open-add-period" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-white shadow-md transition flex items-center gap-1">
+          <button id="btn-open-add-period" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-white shadow-md transition flex items-center gap-1.5">
             <i class="ph-bold ph-plus-circle"></i>
-            <span>Add Class Period</span>
+            <span>Add Custom Period</span>
           </button>
         </div>
 
@@ -274,38 +299,141 @@
         </div>
       </div>
 
-      <!-- SUBVIEW 2: DLP (DAILY LESSON LOG & PLAN REPOSITORY) -->
-      <div id="subview-dlp" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <div>
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Daily Lesson Plan Management (DepEd 4As / 7Es)</h3>
-            <p class="text-xs text-slate-500">Create structured digital lesson logs or attach completed DOCX/PDF files and Google Docs.</p>
+      <!-- ================= MODULE 2: ATTENDANCE TRACKER ================= -->
+      <div id="module-container-attendance" class="hidden space-y-6">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="ph-bold ph-check-square text-emerald-500 text-lg"></i>
+                <span>Daily Attendance Register</span>
+              </h3>
+              <p id="attendance-advisory-label" class="text-xs text-slate-500 dark:text-slate-400">Class Advisory Roster</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <input type="date" id="attendance-date-input" class="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white">
+              <button id="btn-mark-all-present" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold hover:bg-emerald-100">
+                Mark All Present
+              </button>
+            </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <a href="https://docs.google.com/document/d/1dJek5poT9sIZHwbfqcPwlnwF2xKMw1Icqducqe2tA7k/copy" target="_blank" class="px-3 py-1.5 rounded-xl border border-blue-300 dark:border-blue-800 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 text-xs font-semibold flex items-center gap-1.5 hover:bg-blue-100">
-              <i class="ph-bold ph-google-logo"></i>
-              <span>Junior High Template</span>
-            </a>
-            <a href="https://docs.google.com/document/d/1oveExgLydYJlBWAqdz0xjzYoHpAw5nzj/copy" target="_blank" class="px-3 py-1.5 rounded-xl border border-indigo-300 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 text-xs font-semibold flex items-center gap-1.5 hover:bg-indigo-100">
-              <i class="ph-bold ph-google-logo"></i>
-              <span>Senior High (11-12) Template</span>
-            </a>
-            <button id="btn-open-new-dlp" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-md flex items-center gap-1.5">
-              <i class="ph-bold ph-plus"></i>
-              <span>New DLP / Upload File</span>
-            </button>
+
+          <!-- Attendance KPI Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900 text-center">
+              <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 uppercase">Present</span>
+              <div id="kpi-att-present" class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mt-0.5">0</div>
+            </div>
+            <div class="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900 text-center">
+              <span class="text-[11px] font-bold text-amber-700 dark:text-amber-300 uppercase">Late</span>
+              <div id="kpi-att-late" class="text-xl font-bold text-amber-800 dark:text-amber-200 mt-0.5">0</div>
+            </div>
+            <div class="p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/60 dark:border-rose-900 text-center">
+              <span class="text-[11px] font-bold text-rose-700 dark:text-rose-300 uppercase">Absent</span>
+              <div id="kpi-att-absent" class="text-xl font-bold text-rose-800 dark:text-rose-200 mt-0.5">0</div>
+            </div>
+            <div class="p-3 rounded-xl bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200/60 dark:border-sky-900 text-center">
+              <span class="text-[11px] font-bold text-sky-700 dark:text-sky-300 uppercase">Excused</span>
+              <div id="kpi-att-excused" class="text-xl font-bold text-sky-800 dark:text-sky-200 mt-0.5">0</div>
+            </div>
+          </div>
+
+          <!-- Attendance Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800 font-semibold text-slate-500 uppercase">
+                  <th class="py-2.5 px-3 w-12">#</th>
+                  <th class="py-2.5 px-3">Student Name</th>
+                  <th class="py-2.5 px-3">Gender</th>
+                  <th class="py-2.5 px-3 text-center">Status Action</th>
+                  <th class="py-2.5 px-3">Remarks / Reason</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/80">
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
 
-        <div id="dlp-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Dynamically populated DLPs -->
+      <!-- ================= MODULE 3: E-CLASS RECORD (GRADES) ================= -->
+      <div id="module-container-grades" class="hidden space-y-6">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="ph-bold ph-chart-line-up text-emerald-500 text-lg"></i>
+                <span>DepEd E-Class Record (Grading Sheet)</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Written Works (40%) • Performance Tasks (40%) • Quarterly Exam (20%)</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select id="grades-subject-select" class="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white">
+              </select>
+              <select id="grades-quarter-select" class="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white">
+                <option value="Q1">1st Quarter</option>
+                <option value="Q2">2nd Quarter</option>
+                <option value="Q3">3rd Quarter</option>
+                <option value="Q4">4th Quarter</option>
+              </select>
+              <button id="btn-export-grades-csv" class="text-xs px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold border border-slate-300 dark:border-slate-700 flex items-center gap-1">
+                <i class="ph ph-file-csv"></i>
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Grades Spreadsheet Matrix -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[700px]">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider">
+                  <th class="py-2.5 px-3 w-10">#</th>
+                  <th class="py-2.5 px-3 min-w-[150px]">Student Full Name</th>
+                  <th class="py-2.5 px-2 text-center w-28 bg-emerald-50/50 dark:bg-emerald-950/20">Written Works (40%)<br><span class="text-[10px] text-slate-400 font-normal">Score / 100</span></th>
+                  <th class="py-2.5 px-2 text-center w-28 bg-teal-50/50 dark:bg-teal-950/20">Perf. Tasks (40%)<br><span class="text-[10px] text-slate-400 font-normal">Score / 100</span></th>
+                  <th class="py-2.5 px-2 text-center w-28 bg-sky-50/50 dark:bg-sky-950/20">Quarter Exam (20%)<br><span class="text-[10px] text-slate-400 font-normal">Score / 100</span></th>
+                  <th class="py-2.5 px-3 text-center w-20">Initial Grade</th>
+                  <th class="py-2.5 px-3 text-center w-24">Transmuted</th>
+                  <th class="py-2.5 px-3 text-center w-24">Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="grades-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= MODULE 4: DLP REPOSITORY ================= -->
+      <div id="module-container-dlp" class="hidden space-y-6">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="ph-bold ph-notebook text-emerald-500 text-lg"></i>
+                <span>Daily Lesson Plan (DLP) Management</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Lesson plans with 4As format, competencies, procedures, and approval workflow</p>
+            </div>
+            <button id="btn-create-dlp" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-sm flex items-center gap-1.5 self-start sm:self-auto">
+              <i class="ph-bold ph-plus"></i>
+              <span>Create New DLP</span>
+            </button>
+          </div>
+
+          <!-- DLP Cards / Registry List -->
+          <div id="dlp-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          </div>
         </div>
       </div>
 
     </section>
 
-    <!-- 3. PRINCIPAL DASHBOARD -->
+    <!-- 3. PRINCIPAL DASHBOARD (Superuser Supervision Suite) -->
     <section id="view-principal-dashboard" class="hidden space-y-6">
+      
       <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 text-white shadow-xl border border-indigo-800/40">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="flex items-center gap-4">
@@ -315,42 +443,22 @@
             <div>
               <div class="flex items-center gap-2">
                 <h2 class="text-2xl font-bold tracking-tight">Office of the School Principal</h2>
-                <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/40 text-indigo-200 border border-indigo-400/30 font-medium">Master Access</span>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/40 text-indigo-200 border border-indigo-400/30 font-medium">Master Supervision Suite</span>
               </div>
-              <p class="text-xs text-indigo-200/80 mt-1">Superuser Management • Campus Timetable • DLP Approval Registry</p>
+              <p class="text-xs text-indigo-200/80 mt-1">Campus Oversight • Real-Time Class Monitor • DLP Approvals • Academic Records</p>
             </div>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
             <button id="btn-open-memo" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md transition flex items-center gap-1.5">
               <i class="ph-bold ph-megaphone"></i>
-              <span>Post Memo / Banner</span>
+              <span>Post School Memo</span>
             </button>
             <button id="btn-principal-credentials" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white border border-white/10 transition flex items-center gap-1.5">
               <i class="ph ph-users-three"></i>
               <span>Faculty PIN Manager</span>
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Principal DLP Review Registry -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <i class="ph-bold ph-stamp text-indigo-600"></i>
-              <span>Faculty Daily Lesson Plans (DLP) Submissions & Endorsement</span>
-            </h3>
-            <p class="text-xs text-slate-500">Review, verify, and approve Junior High and Senior High Lesson Plans.</p>
-          </div>
-          <span id="principal-dlp-pending-badge" class="text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold">
-            0 Pending Submissions
-          </span>
-        </div>
-
-        <div id="principal-dlp-review-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-          <!-- Populated with all faculty submitted DLPs -->
         </div>
       </div>
 
@@ -370,12 +478,27 @@
         </div>
       </div>
 
-      <!-- Individual Schedule Manager for Principal -->
+      <!-- Principal DLP Approvals & Inspection Queue -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="ph-bold ph-stamp text-indigo-500"></i>
+              <span>Faculty Daily Lesson Plans (DLP) Approvals</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Review, sign, or approve submitted lesson plans across all 12 teachers</p>
+          </div>
+        </div>
+        <div id="principal-dlp-queue" class="divide-y divide-slate-100 dark:divide-slate-800">
+        </div>
+      </div>
+
+      <!-- Individual Schedule & Class Manager for Principal -->
       <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Individual Teacher Schedule Manager</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Select any teacher below to inspect, edit their periods, or modify their profile.</p>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Individual Teacher Timetable & Record Manager</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Inspect periods or update configurations for any faculty member.</p>
           </div>
           <div class="flex items-center gap-2">
             <label class="text-xs font-semibold text-slate-500">Teacher:</label>
@@ -387,107 +510,69 @@
         <div id="principal-selected-teacher-container" class="space-y-3">
         </div>
       </div>
+
     </section>
 
   </main>
 
-  <!-- ================= DLP MODAL (CREATE INTERACTIVE / UPLOAD FILE) ================= -->
+  <!-- ================= DLP CREATE / VIEW MODAL ================= -->
   <div id="modal-dlp" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
         <div>
           <h3 id="modal-dlp-title" class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <i class="ph-bold ph-notebook text-emerald-500"></i>
             Daily Lesson Plan (DLP)
           </h3>
-          <p class="text-xs text-slate-500">Create new structured log or upload completed Google Docs / PDF</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">DepEd Standard 4As Learning Framework</p>
         </div>
-        <button id="btn-close-dlp-modal" class="text-slate-400 hover:text-slate-600 text-lg">
+        <button id="btn-close-dlp-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg p-1">
           <i class="ph ph-x"></i>
         </button>
       </div>
 
-      <form id="dlp-form" class="space-y-4 overflow-y-auto flex-1 pr-1">
+      <form id="dlp-form" class="overflow-y-auto py-4 space-y-3.5 flex-1 pr-1 text-xs">
         <input type="hidden" id="dlp-id-input" value="">
-        
-        <!-- Submission Mode Selector -->
-        <div class="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
-          <button type="button" id="dlp-mode-btn-form" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white">
-            Use Interactive Form
-          </button>
-          <button type="button" id="dlp-mode-btn-upload" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300">
-            Upload File / Paste Doc Link
-          </button>
-        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Lesson Title / Subject</label>
-            <input type="text" id="dlp-title-input" required placeholder="e.g. General Chemistry: Stoichiometry" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Subject / Grade & Section</label>
+            <input type="text" id="dlp-subject-input" required placeholder="e.g. Science 7 - Diamond" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">DepEd Curriculum Level & Template</label>
-            <select id="dlp-level-select" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
-              <option value="JHS">Junior High School (Grades 7 - 10)</option>
-              <option value="SHS">Senior High School (Grades 11 - 12)</option>
-            </select>
+            <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Lesson Date</label>
+            <input type="date" id="dlp-date-input" required class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Target Date</label>
-            <input type="date" id="dlp-date-input" required class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Grade Level & Section</label>
-            <input type="text" id="dlp-grade-section" placeholder="e.g. Grade 11 - STEM A" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
-          </div>
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Topic / Title</label>
+          <input type="text" id="dlp-topic-input" required placeholder="e.g. The Scientific Method & Hypotheses" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
         </div>
 
-        <!-- MODE 1: INTERACTIVE FORM CONTAINER -->
-        <div id="dlp-interactive-fields" class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Learning Competency & MELC Code</label>
-            <textarea id="dlp-competency" rows="2" placeholder="e.g. Determine the mass relationship in chemical reactions (STEM_GC11MR-Ib-64)" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Learning Resources & References</label>
-              <textarea id="dlp-resources" rows="2" placeholder="Teacher's Guide, Learner's Module, Lab Equipment..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Formative Assessment / Evaluation</label>
-              <textarea id="dlp-assessment" rows="2" placeholder="Exit ticket, 5-item short quiz, rubric-scored output..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Procedure (DepEd 4As: Activity, Analysis, Abstraction, Application)</label>
-            <textarea id="dlp-procedures" rows="4" placeholder="Outline the 4As or 7Es classroom flow..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-          </div>
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">I. Learning Objectives (Cognitive, Affective, Psychomotor)</label>
+          <textarea id="dlp-objectives-input" rows="2" required placeholder="State measurable learning targets..." class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
         </div>
 
-        <!-- MODE 2: FILE UPLOAD OR DOC LINK CONTAINER -->
-        <div id="dlp-upload-fields" class="hidden space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Option 1: Google Docs / Cloud Link</label>
-            <input type="url" id="dlp-link-input" placeholder="https://docs.google.com/document/d/..." class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Option 2: Attach Word / PDF Document</label>
-            <input type="file" id="dlp-file-input" accept=".pdf,.doc,.docx,.txt" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-            <span id="dlp-file-name-label" class="text-[11px] text-emerald-600 mt-1 block"></span>
-          </div>
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">II. Learning Resources / References</label>
+          <input type="text" id="dlp-resources-input" placeholder="e.g. Science 7 Learner's Material pp. 45-50, Slide Deck" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">III. Procedures (4As: Activity, Analysis, Abstraction, Application)</label>
+          <textarea id="dlp-procedure-input" rows="4" placeholder="Detail instructional flow and activities..." class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">IV. Assessment / Assignment & Remarks</label>
+          <input type="text" id="dlp-assessment-input" placeholder="e.g. 5-item formative quiz, exit slip" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
         </div>
 
         <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
           <button type="button" id="btn-cancel-dlp-modal" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
-          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 flex items-center gap-1.5">
-            <i class="ph-bold ph-paper-plane-tilt"></i>
-            <span>Submit to Cloud</span>
-          </button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500">Save DLP to Cloud</button>
         </div>
       </form>
     </div>
@@ -693,7 +778,7 @@
     </div>
   </div>
 
-  <!-- ================= FIREBASE CLOUD FIRESTORE SYNCHRONIZATION ENGINE ================= -->
+  <!-- ================= FIREBASE CLOUD SYNC & APPLICATION ENGINE ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -720,7 +805,7 @@
     let currentUserFirebase = null;
     let isCloudReady = false;
 
-    // 1. DEFAULT DATA CONFIGURATION
+    // Faculty Directory
     const DEFAULT_FACULTY = [
       {
         id: 'borla',
@@ -731,6 +816,7 @@
         room: 'Computer Laboratory',
         email: 'kent.borla@deped.gov.ph',
         avatar: 'kent.png',
+        advisory: 'Grade 7 - Diamond',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "08:20", title: "Science 7", room: "Room 7-A", type: "class", days: [1,2,3,4,5] },
@@ -752,6 +838,7 @@
         room: 'Room 11 & Library',
         email: 'marian.carino@deped.gov.ph',
         avatar: 'marian.png',
+        advisory: 'Grade 11 - St. Augustine',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "08:20", title: "English 8", room: "Room 8-B", type: "class", days: [1,2,3,4,5] },
@@ -774,6 +861,7 @@
         room: "Registrar's Office",
         email: 'willyn.senagan@deped.gov.ph',
         avatar: 'willyn.png',
+        advisory: 'Grade 10 - Emerald',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "08:20", title: "Math 9", room: "Room 9-A", type: "class", days: [1,2,3,4,5] },
@@ -795,6 +883,7 @@
         room: 'TLE Laboratory',
         email: 'anajea.esparcia@deped.gov.ph',
         avatar: 'ana.png',
+        advisory: 'Grade 9 - Ruby',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "08:20", title: "Science 10", room: "Room 10-A", type: "class", days: [1,2,3,4,5] },
@@ -817,6 +906,7 @@
         room: 'Room 12',
         email: 'john.catipay@deped.gov.ph',
         avatar: 'john.png',
+        advisory: 'Grade 12 - HUMSS St. Thomas',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "08:30", title: "Life and Career Skills 11", room: "SHS Room 11", type: "class", days: [1,2,3,4,5] },
@@ -838,6 +928,7 @@
         room: 'SSLG Office',
         email: 'charls.dagwayan@deped.gov.ph',
         avatar: 'charls.png',
+        advisory: 'Grade 8 - Sapphire',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "09:30", title: "Empowerment Technologies 12", room: "Computer Lab", type: "class", days: [1,2,3,4,5] },
@@ -860,6 +951,7 @@
         room: 'Science Laboratory',
         email: 'chezel.antiquina@deped.gov.ph',
         avatar: 'chezel.png',
+        advisory: 'Grade 12 - STEM Curie',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "09:30", title: "Practical Research II 12", room: "SHS Building", type: "class", days: [5] },
@@ -882,6 +974,7 @@
         room: 'Room 10',
         email: 'claudine.rodriguez@deped.gov.ph',
         avatar: 'claudine.png',
+        advisory: 'Grade 10 - Pearl',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "08:20", title: "English 7", room: "Room 7-A", type: "class", days: [1,2,3,4,5] },
@@ -905,6 +998,7 @@
         room: 'POD Room',
         email: 'jill.mayuela@deped.gov.ph',
         avatar: 'jill.png',
+        advisory: 'Grade 8 - Topaz',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "09:10", title: "Vacant / Lesson Prep", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
@@ -925,6 +1019,7 @@
         room: 'POD Room',
         email: 'rowena.cadungog@deped.gov.ph',
         avatar: 'rowena.png',
+        advisory: 'Grade 9 - Garnet',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "10:20", title: "Vacant / Research", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
@@ -944,6 +1039,7 @@
         room: "Cashier's Office",
         email: 'glenn.culibra@deped.gov.ph',
         avatar: '',
+        advisory: 'Pastoral Council',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "11:10", title: "Vacant / Pastoral Duties", room: "Pastoral Center", type: "vacant", days: [1,2,3,4,5] },
@@ -963,6 +1059,7 @@
         room: 'Clinic',
         email: 'nancy.anito@deped.gov.ph',
         avatar: 'nancy.png',
+        advisory: 'Grade 7 - Opal',
         periods: [
           { start: "07:00", end: "07:30", title: "Preliminaries", room: "Campus Grounds", type: "break", days: [1,2,3,4,5] },
           { start: "07:30", end: "09:10", title: "Vacant / Office Time", room: "Faculty Room", type: "vacant", days: [1,2,3,4,5] },
@@ -978,6 +1075,19 @@
       }
     ];
 
+    const DEFAULT_STUDENTS = [
+      { id: 's1', lrn: '109283746501', name: 'Alcantara, Christian Dave M.', gender: 'Male' },
+      { id: 's2', lrn: '109283746502', name: 'Bautista, Joshua Kyle B.', gender: 'Male' },
+      { id: 's3', lrn: '109283746503', name: 'Canete, Mark Anthony P.', gender: 'Male' },
+      { id: 's4', lrn: '109283746504', name: 'Dela Cruz, Juan Gabriel R.', gender: 'Male' },
+      { id: 's5', lrn: '109283746505', name: 'Espina, Kevin James T.', gender: 'Male' },
+      { id: 's6', lrn: '109283746506', name: 'Abellana, Sophia Marie C.', gender: 'Female' },
+      { id: 's7', lrn: '109283746507', name: 'Borres, Andrea Nicole L.', gender: 'Female' },
+      { id: 's8', lrn: '109283746508', name: 'Cuyos, Bea Patricia S.', gender: 'Female' },
+      { id: 's9', lrn: '109283746509', name: 'Daclan, Hannah Camille V.', gender: 'Female' },
+      { id: 's10', lrn: '109283746510', name: 'Flores, Princess Angela D.', gender: 'Female' }
+    ];
+
     const DEFAULT_PRINCIPAL_USER = {
       role: 'principal',
       username: 'principal',
@@ -986,48 +1096,53 @@
       title: 'Principal IV'
     };
 
-    // State Variables
+    // Suite State
     let faculty = JSON.parse(JSON.stringify(DEFAULT_FACULTY));
     let principalPin = '1234';
-    let memoText = "Welcome to the School Year! Teachers may inspect and manage their timetable and DLPs below.";
-    let dlpList = []; // Centralized DLPs
+    let memoText = "Welcome to the School Year! Teachers may inspect and manage timetables, attendance, class records, and DLPs.";
     let currentUser = null; 
-    let activeSuiteTab = 'timetable'; // 'timetable' or 'dlp'
+    let currentModule = 'schedule'; // 'schedule', 'attendance', 'grades', 'dlp'
     let teacherActiveTab = 'timeline';
     let isSimulated = false;
     let simDay = 5;
     let simMinutes = 8 * 60;
     let selectedPrincipalTeacherId = 'borla';
     let tempImageBase64 = null;
-    let tempDlpFileBase64 = null;
-    let tempDlpFileName = null;
-    let currentDlpMode = 'form'; // 'form' or 'upload'
 
-    // Local session restore
+    // Attendance, Grades & DLP state structures
+    let attendanceRecords = {}; // { 'teacherId_date': { studentId: { status: 'P'|'L'|'A'|'E', remarks: '' } } }
+    let gradesRecords = {};     // { 'teacherId_subject_quarter': { studentId: { ww: 88, pt: 90, qa: 85 } } }
+    let lessonPlans = [];       // [ { id, teacherId, teacherName, subject, date, topic, objectives, resources, procedure, assessment, status: 'Draft'|'Submitted'|'Approved' } ]
+
+    // Local Session Restoration
     const savedUser = sessionStorage.getItem('school_auth_session');
     if (savedUser) {
       try { currentUser = JSON.parse(savedUser); } catch (e) { currentUser = null; }
     }
 
     function loadLocalCache() {
-      const saved = localStorage.getItem('school_suite_cache_v1');
+      const saved = localStorage.getItem('school_portal_suite_cache_v1');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (parsed.faculty) faculty = parsed.faculty;
           if (parsed.principalPin) principalPin = parsed.principalPin;
           if (parsed.memoText !== undefined) memoText = parsed.memoText;
-          if (parsed.dlpList) dlpList = parsed.dlpList;
+          if (parsed.attendanceRecords) attendanceRecords = parsed.attendanceRecords;
+          if (parsed.gradesRecords) gradesRecords = parsed.gradesRecords;
+          if (parsed.lessonPlans) lessonPlans = parsed.lessonPlans;
         } catch (e) {}
       }
     }
 
     function saveLocalCache() {
-      localStorage.setItem('school_suite_cache_v1', JSON.stringify({
+      localStorage.setItem('school_portal_suite_cache_v1', JSON.stringify({
         faculty,
         principalPin,
         memoText,
-        dlpList
+        attendanceRecords,
+        gradesRecords,
+        lessonPlans
       }));
     }
 
@@ -1046,7 +1161,7 @@
       }
     }
 
-    // Cloud synchronization
+    // Unified Firestore Save
     async function syncToCloud() {
       saveLocalCache();
       if (!isCloudReady || !db) return;
@@ -1057,7 +1172,9 @@
           faculty: JSON.stringify(faculty),
           principalPin: principalPin,
           memoText: memoText,
-          dlpList: JSON.stringify(dlpList),
+          attendanceRecords: JSON.stringify(attendanceRecords),
+          gradesRecords: JSON.stringify(gradesRecords),
+          lessonPlans: JSON.stringify(lessonPlans),
           lastUpdated: new Date().toISOString()
         }, { merge: true });
         updateSyncIndicator('connected');
@@ -1075,6 +1192,7 @@
       }
     }
 
+    // Initialize Firebase
     async function setupFirebaseSync() {
       loadLocalCache();
       renderApp();
@@ -1099,6 +1217,7 @@
         isCloudReady = true;
         updateSyncIndicator('connected');
 
+        // Realtime Listener
         const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'timetable', 'master');
         onSnapshot(publicDocRef, (docSnap) => {
           if (docSnap.exists()) {
@@ -1121,10 +1240,16 @@
             }
             if (data.principalPin) principalPin = data.principalPin;
             if (data.memoText !== undefined) memoText = data.memoText;
-            if (data.dlpList) {
-              try { dlpList = JSON.parse(data.dlpList); } catch (e) { console.error(e); }
+            if (data.attendanceRecords) {
+              try { attendanceRecords = JSON.parse(data.attendanceRecords); } catch (e) {}
             }
-            
+            if (data.gradesRecords) {
+              try { gradesRecords = JSON.parse(data.gradesRecords); } catch (e) {}
+            }
+            if (data.lessonPlans) {
+              try { lessonPlans = JSON.parse(data.lessonPlans); } catch (e) {}
+            }
+
             saveLocalCache();
             updateSyncIndicator('connected');
             renderApp();
@@ -1137,12 +1262,12 @@
         });
 
       } catch (err) {
-        console.warn("Cloud connection error, operating in offline cache mode.", err);
+        console.warn("Cloud connection offline. Operating locally.", err);
         updateSyncIndicator('offline');
       }
     }
 
-    // Time Utilities
+    // Time & Clock
     function getCurrentDayAndMinutes() {
       if (isSimulated) {
         return { day: simDay, minutes: simMinutes };
@@ -1184,7 +1309,7 @@
 
       if (currentUser) {
         if (currentUser.role === 'teacher') {
-          renderTeacherDashboard();
+          if (currentModule === 'schedule') renderTeacherSchedule();
         } else if (currentUser.role === 'principal') {
           renderPrincipalMonitorGrid();
         }
@@ -1193,7 +1318,7 @@
 
     setInterval(updateNavClock, 1000);
 
-    // Auth Handlers
+    // Authentication
     function handleLoginSubmit(e) {
       e.preventDefault();
       const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
@@ -1243,7 +1368,7 @@
       renderApp();
     }
 
-    // App View Switching
+    // Core View Router
     function renderApp() {
       const loginView = document.getElementById('view-login');
       const teacherView = document.getElementById('view-teacher-dashboard');
@@ -1269,7 +1394,7 @@
         authNav.innerHTML = `
           <button id="nav-btn-login-focus" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm flex items-center gap-1.5">
             <i class="ph ph-sign-in"></i>
-            <span>Teacher Login</span>
+            <span>Sign In</span>
           </button>
         `;
         const btnFocus = document.getElementById('nav-btn-login-focus');
@@ -1289,7 +1414,7 @@
         teacherView.classList.remove('hidden');
         principalView.classList.add('hidden');
 
-        roleBadge.textContent = 'Teacher Account';
+        roleBadge.textContent = 'Faculty Account';
         roleBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
 
         authNav.innerHTML = `
@@ -1305,7 +1430,7 @@
         `;
         document.getElementById('nav-btn-logout').onclick = logout;
 
-        renderTeacherDashboard();
+        renderTeacherSuite(currentTeacher);
 
       } else if (currentUser.role === 'principal') {
         teacherView.classList.add('hidden');
@@ -1331,14 +1456,11 @@
       }
     }
 
-    // Teacher Dashboard Logic
-    function renderTeacherDashboard() {
-      const teacher = faculty.find(t => t.id === currentUser.teacherId);
-      if (!teacher) return;
-
+    // Teacher Suite Module Controller
+    function renderTeacherSuite(teacher) {
       document.getElementById('teacher-hero-name').textContent = teacher.name;
       document.getElementById('teacher-hero-dept').textContent = teacher.dept;
-      document.getElementById('teacher-hero-room').innerHTML = `<i class="ph ph-map-pin"></i> ${escapeHtml(teacher.room || 'Assigned Room')}`;
+      document.getElementById('teacher-hero-room').innerHTML = `<i class="ph ph-map-pin"></i> ${escapeHtml(teacher.room || 'Room')}`;
       document.getElementById('teacher-hero-email').innerHTML = `<i class="ph ph-envelope"></i> ${escapeHtml(teacher.email || 'deped.gov.ph')}`;
 
       const avatarContainer = document.getElementById('teacher-hero-avatar');
@@ -1350,26 +1472,36 @@
         avatarContainer.textContent = getInitials(teacher.name);
       }
 
-      if (activeSuiteTab === 'timetable') {
-        document.getElementById('subview-timetable').classList.remove('hidden');
-        document.getElementById('subview-dlp').classList.add('hidden');
-        
-        document.getElementById('suite-tab-timetable').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5';
-        document.getElementById('suite-tab-dlp').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5';
-        
-        renderTimetableSubmodule(teacher);
-      } else {
-        document.getElementById('subview-timetable').classList.add('hidden');
-        document.getElementById('subview-dlp').classList.remove('hidden');
-        
-        document.getElementById('suite-tab-dlp').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5';
-        document.getElementById('suite-tab-timetable').className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5';
-        
-        renderTeacherDlpSubmodule(teacher);
+      // Switch active module visibility
+      const modules = ['schedule', 'attendance', 'grades', 'dlp'];
+      modules.forEach(m => {
+        const container = document.getElementById(`module-container-${m}`);
+        const tabBtn = document.getElementById(`suite-tab-${m}`);
+        if (m === currentModule) {
+          container.classList.remove('hidden');
+          tabBtn.className = 'suite-tab-btn active px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5';
+        } else {
+          container.classList.add('hidden');
+          tabBtn.className = 'suite-tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition flex items-center gap-1.5';
+        }
+      });
+
+      if (currentModule === 'schedule') {
+        renderTeacherSchedule();
+      } else if (currentModule === 'attendance') {
+        renderTeacherAttendance(teacher);
+      } else if (currentModule === 'grades') {
+        renderTeacherGrades(teacher);
+      } else if (currentModule === 'dlp') {
+        renderTeacherDLP(teacher);
       }
     }
 
-    function renderTimetableSubmodule(teacher) {
+    // ================= MODULE 1 LOGIC: SCHEDULE =================
+    function renderTeacherSchedule() {
+      const teacher = faculty.find(t => t.id === currentUser.teacherId);
+      if (!teacher) return;
+
       const { day, minutes } = getCurrentDayAndMinutes();
       const currentPeriod = getActivePeriodForTeacher(teacher, day, minutes);
       const liveBox = document.getElementById('teacher-live-indicator');
@@ -1452,17 +1584,17 @@
       const weeklyView = document.getElementById('teacher-view-weekly');
 
       if (tab === 'timeline') {
-        tabTimelineBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition';
-        tabWeeklyBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition';
+        tabTimelineBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition';
+        tabWeeklyBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition';
         timelineView.classList.remove('hidden');
         weeklyView.classList.add('hidden');
       } else {
-        tabWeeklyBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition';
-        tabTimelineBtn.className = 'px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition';
+        tabWeeklyBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white shadow-sm transition';
+        tabTimelineBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition';
         weeklyView.classList.remove('hidden');
         timelineView.classList.add('hidden');
       }
-      renderTeacherDashboard();
+      renderTeacherSchedule();
     }
 
     function renderTeacherTimeline(teacher, day, currentMinutes) {
@@ -1539,6 +1671,7 @@
 
     function renderTeacherWeekly(teacher) {
       const tbody = document.getElementById('teacher-weekly-matrix-body');
+      
       const slotMap = new Map();
       teacher.periods.forEach(p => {
         const key = `${p.start}-${p.end}`;
@@ -1593,77 +1726,373 @@
       }).join('');
     }
 
-    // Teacher DLP Submodule
-    function renderTeacherDlpSubmodule(teacher) {
-      const container = document.getElementById('dlp-list-container');
-      const teacherDlps = dlpList.filter(d => d.teacherId === teacher.id);
+    // ================= MODULE 2 LOGIC: ATTENDANCE TRACKER =================
+    function renderTeacherAttendance(teacher) {
+      const dateInput = document.getElementById('attendance-date-input');
+      if (!dateInput.value) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+      }
+      const selectedDate = dateInput.value;
+      const key = `${teacher.id}_${selectedDate}`;
 
-      if (teacherDlps.length === 0) {
+      document.getElementById('attendance-advisory-label').textContent = `Advisory Class: ${teacher.advisory || 'Grade 7 - Diamond'}`;
+
+      if (!attendanceRecords[key]) {
+        // Default to present for everyone on first load of the day
+        attendanceRecords[key] = {};
+        DEFAULT_STUDENTS.forEach(s => {
+          attendanceRecords[key][s.id] = { status: 'P', remarks: '' };
+        });
+      }
+
+      const dayRoll = attendanceRecords[key];
+      let presentCount = 0, lateCount = 0, absentCount = 0, excusedCount = 0;
+
+      const tbody = document.getElementById('attendance-table-body');
+      tbody.innerHTML = DEFAULT_STUDENTS.map((s, idx) => {
+        const rec = dayRoll[s.id] || { status: 'P', remarks: '' };
+        if (rec.status === 'P') presentCount++;
+        else if (rec.status === 'L') lateCount++;
+        else if (rec.status === 'A') absentCount++;
+        else if (rec.status === 'E') excusedCount++;
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3 px-3 text-slate-400 font-mono">${idx + 1}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(s.name)}</div>
+              <div class="text-[10px] text-slate-400 font-mono">LRN: ${s.lrn}</div>
+            </td>
+            <td class="py-3 px-3 text-slate-500">${s.gender}</td>
+            <td class="py-3 px-3 text-center">
+              <div class="inline-flex rounded-xl p-1 bg-slate-100 dark:bg-slate-800 gap-1 border border-slate-200 dark:border-slate-700">
+                <button data-att-sid="${s.id}" data-att-val="P" class="px-2.5 py-1 text-xs rounded-lg font-bold transition ${rec.status === 'P' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200'}">P</button>
+                <button data-att-sid="${s.id}" data-att-val="L" class="px-2.5 py-1 text-xs rounded-lg font-bold transition ${rec.status === 'L' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200'}">L</button>
+                <button data-att-sid="${s.id}" data-att-val="A" class="px-2.5 py-1 text-xs rounded-lg font-bold transition ${rec.status === 'A' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200'}">A</button>
+                <button data-att-sid="${s.id}" data-att-val="E" class="px-2.5 py-1 text-xs rounded-lg font-bold transition ${rec.status === 'E' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200'}">E</button>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <input type="text" data-att-remark-sid="${s.id}" value="${escapeHtml(rec.remarks || '')}" placeholder="Add note..." class="w-full px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-white">
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Update KPIs
+      document.getElementById('kpi-att-present').textContent = presentCount;
+      document.getElementById('kpi-att-late').textContent = lateCount;
+      document.getElementById('kpi-att-absent').textContent = absentCount;
+      document.getElementById('kpi-att-excused').textContent = excusedCount;
+
+      // Event listeners for status toggles
+      tbody.querySelectorAll('[data-att-val]').forEach(btn => {
+        btn.onclick = async () => {
+          const sid = btn.dataset.attSid;
+          const val = btn.dataset.attVal;
+          if (!attendanceRecords[key][sid]) attendanceRecords[key][sid] = { remarks: '' };
+          attendanceRecords[key][sid].status = val;
+          renderTeacherAttendance(teacher);
+          await syncToCloud();
+        };
+      });
+
+      tbody.querySelectorAll('[data-att-remark-sid]').forEach(input => {
+        input.onchange = async () => {
+          const sid = input.dataset.attRemarkSid;
+          if (!attendanceRecords[key][sid]) attendanceRecords[key][sid] = { status: 'P' };
+          attendanceRecords[key][sid].remarks = input.value.trim();
+          await syncToCloud();
+        };
+      });
+
+      document.getElementById('attendance-date-input').onchange = () => renderTeacherAttendance(teacher);
+      document.getElementById('btn-mark-all-present').onclick = async () => {
+        DEFAULT_STUDENTS.forEach(s => {
+          attendanceRecords[key][s.id] = { status: 'P', remarks: '' };
+        });
+        renderTeacherAttendance(teacher);
+        await syncToCloud();
+      };
+    }
+
+    // ================= MODULE 3 LOGIC: E-CLASS RECORD (GRADES) =================
+    // DepEd Transmutation Table Standard (Initial Grade to Transmuted Grade)
+    function transmuteDepEdGrade(initialGrade) {
+      const g = Math.round(initialGrade * 10) / 10;
+      if (g >= 100) return 100;
+      if (g >= 98.40) return 99;
+      if (g >= 96.80) return 98;
+      if (g >= 95.20) return 97;
+      if (g >= 93.60) return 96;
+      if (g >= 92.00) return 95;
+      if (g >= 90.40) return 94;
+      if (g >= 88.80) return 93;
+      if (g >= 87.20) return 92;
+      if (g >= 85.60) return 91;
+      if (g >= 84.00) return 90;
+      if (g >= 82.40) return 89;
+      if (g >= 80.80) return 88;
+      if (g >= 79.20) return 87;
+      if (g >= 77.60) return 86;
+      if (g >= 76.00) return 85;
+      if (g >= 74.40) return 84;
+      if (g >= 72.80) return 83;
+      if (g >= 71.20) return 82;
+      if (g >= 69.60) return 81;
+      if (g >= 68.00) return 80;
+      if (g >= 66.40) return 79;
+      if (g >= 64.80) return 78;
+      if (g >= 63.20) return 77;
+      if (g >= 61.60) return 76;
+      if (g >= 60.00) return 75;
+      if (g >= 56.00) return 74;
+      if (g >= 52.00) return 73;
+      if (g >= 48.00) return 72;
+      if (g >= 44.00) return 71;
+      if (g >= 40.00) return 70;
+      return 68; // Minimum failing floor
+    }
+
+    function renderTeacherGrades(teacher) {
+      // Extract classes assigned to this teacher
+      const classPeriods = teacher.periods.filter(p => p.type === 'class');
+      const uniqueSubjects = [...new Set(classPeriods.map(p => p.title))];
+
+      const subjSelect = document.getElementById('grades-subject-select');
+      const prevSubj = subjSelect.value;
+      subjSelect.innerHTML = uniqueSubjects.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+      if (uniqueSubjects.includes(prevSubj)) subjSelect.value = prevSubj;
+
+      const currentSubj = subjSelect.value || uniqueSubjects[0] || 'General Subject';
+      const currentQuarter = document.getElementById('grades-quarter-select').value;
+      const key = `${teacher.id}_${currentSubj}_${currentQuarter}`;
+
+      if (!gradesRecords[key]) {
+        gradesRecords[key] = {};
+        DEFAULT_STUDENTS.forEach((s, idx) => {
+          // Default baseline scores
+          const base = 80 + (idx % 15);
+          gradesRecords[key][s.id] = { ww: base, pt: base + 2, qa: base - 3 };
+        });
+      }
+
+      const tableBody = document.getElementById('grades-table-body');
+      tableBody.innerHTML = DEFAULT_STUDENTS.map((s, idx) => {
+        const scores = gradesRecords[key][s.id] || { ww: 75, pt: 75, qa: 75 };
+        const ww = parseFloat(scores.ww) || 0;
+        const pt = parseFloat(scores.pt) || 0;
+        const qa = parseFloat(scores.qa) || 0;
+
+        // Weights: WW 40%, PT 40%, QA 20%
+        const initialGrade = (ww * 0.40) + (pt * 0.40) + (qa * 0.20);
+        const transmuted = transmuteDepEdGrade(initialGrade);
+        const isPassed = transmuted >= 75;
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-2.5 px-3 text-slate-400 font-mono">${idx + 1}</td>
+            <td class="py-2.5 px-3">
+              <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(s.name)}</div>
+              <div class="text-[10px] text-slate-400 font-mono">LRN: ${s.lrn}</div>
+            </td>
+            <td class="py-2.5 px-2 text-center bg-emerald-50/30 dark:bg-emerald-950/10">
+              <input type="number" min="0" max="100" data-grade-sid="${s.id}" data-grade-field="ww" value="${ww}" class="w-16 text-center font-mono py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold">
+            </td>
+            <td class="py-2.5 px-2 text-center bg-teal-50/30 dark:bg-teal-950/10">
+              <input type="number" min="0" max="100" data-grade-sid="${s.id}" data-grade-field="pt" value="${pt}" class="w-16 text-center font-mono py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold">
+            </td>
+            <td class="py-2.5 px-2 text-center bg-sky-50/30 dark:bg-sky-950/10">
+              <input type="number" min="0" max="100" data-grade-sid="${s.id}" data-grade-field="qa" value="${qa}" class="w-16 text-center font-mono py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold">
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300">${initialGrade.toFixed(2)}</td>
+            <td class="py-2.5 px-3 text-center font-mono font-extrabold text-sm ${isPassed ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}">${transmuted}</td>
+            <td class="py-2.5 px-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPassed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'}">
+                ${isPassed ? 'Passed' : 'Failed'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      tableBody.querySelectorAll('[data-grade-sid]').forEach(input => {
+        input.onchange = async () => {
+          const sid = input.dataset.gradeSid;
+          const field = input.dataset.gradeField;
+          let val = parseFloat(input.value) || 0;
+          if (val > 100) val = 100;
+          if (val < 0) val = 0;
+          input.value = val;
+
+          if (!gradesRecords[key][sid]) gradesRecords[key][sid] = { ww: 0, pt: 0, qa: 0 };
+          gradesRecords[key][sid][field] = val;
+          renderTeacherGrades(teacher);
+          await syncToCloud();
+        };
+      });
+
+      subjSelect.onchange = () => renderTeacherGrades(teacher);
+      document.getElementById('grades-quarter-select').onchange = () => renderTeacherGrades(teacher);
+
+      // CSV Export
+      document.getElementById('btn-export-grades-csv').onclick = () => {
+        let csv = 'LRN,Student Name,Written Works (40%),Performance Tasks (40%),Quarter Exam (20%),Initial Grade,Transmuted Grade,Remarks\n';
+        DEFAULT_STUDENTS.forEach(s => {
+          const sc = gradesRecords[key][s.id] || { ww: 0, pt: 0, qa: 0 };
+          const ww = sc.ww, pt = sc.pt, qa = sc.qa;
+          const initG = (ww * 0.40) + (pt * 0.40) + (qa * 0.20);
+          const trans = transmuteDepEdGrade(initG);
+          csv += `"${s.lrn}","${s.name}",${ww},${pt},${qa},${initG.toFixed(2)},${trans},"${trans >= 75 ? 'Passed' : 'Failed'}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${teacher.name.replace(/\s+/g, '_')}_${currentSubj}_${currentQuarter}_Grades.csv`;
+        link.click();
+      };
+    }
+
+    // ================= MODULE 4 LOGIC: DLP MANAGEMENT =================
+    function renderTeacherDLP(teacher) {
+      const container = document.getElementById('dlp-cards-container');
+      const teacherPlans = lessonPlans.filter(p => p.teacherId === teacher.id);
+
+      if (teacherPlans.length === 0) {
         container.innerHTML = `
-          <div class="col-span-full p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-            <i class="ph-bold ph-notebook text-3xl text-slate-400 mb-2"></i>
-            <p class="text-xs text-slate-500">No lesson plans created yet. Click "New DLP / Upload File" above to get started.</p>
+          <div class="col-span-full p-10 text-center bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+            <i class="ph ph-notebook text-4xl text-slate-400 mb-2"></i>
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">No Lesson Plans Created Yet</h4>
+            <p class="text-xs text-slate-500 mt-1 mb-4">Draft and submit structured 4As daily lesson plans for Principal verification.</p>
+            <button onclick="document.getElementById('btn-create-dlp').click()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">
+              + Create First DLP
+            </button>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = teacherDlps.map(dlp => {
-        let statusBadge = dlp.approved 
-          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300"><i class="ph-bold ph-check"></i> Approved by Principal</span>`
-          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"><i class="ph-bold ph-clock"></i> Pending Review</span>`;
-
-        let levelBadge = dlp.level === 'SHS' 
-          ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">Grade 11-12 SHS</span>`
-          : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Grade 7-10 JHS</span>`;
-
-        let fileAttachment = '';
-        if (dlp.docLink) {
-          fileAttachment = `
-            <a href="${escapeHtml(dlp.docLink)}" target="_blank" class="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-2">
-              <i class="ph-bold ph-arrow-square-out"></i> Open Linked Google Doc
-            </a>
-          `;
-        } else if (dlp.fileData) {
-          fileAttachment = `
-            <a href="${dlp.fileData}" download="${dlp.fileName || 'Lesson_Plan'}" class="text-xs text-emerald-600 hover:underline flex items-center gap-1 mt-2">
-              <i class="ph-bold ph-download-simple"></i> Download Attached (${escapeHtml(dlp.fileName || 'Document')})
-            </a>
-          `;
-        }
+      container.innerHTML = teacherPlans.map(plan => {
+        let badgeColor = 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300';
+        if (plan.status === 'Approved') badgeColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300';
+        else if (plan.status === 'Draft') badgeColor = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
 
         return `
-          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col justify-between gap-3">
             <div>
-              <div class="flex items-center justify-between gap-2 mb-2">
-                ${levelBadge}
-                ${statusBadge}
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${badgeColor}">
+                  ${plan.status}
+                </span>
+                <span class="text-[10px] text-slate-400"><i class="ph ph-calendar"></i> ${plan.date}</span>
               </div>
-              <h4 class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(dlp.title)}</h4>
-              <div class="text-[11px] text-slate-500 mt-1">Date: <b>${escapeHtml(dlp.date)}</b> | Section: <b>${escapeHtml(dlp.gradeSection || 'All')}</b></div>
-              
-              ${dlp.competency ? `<p class="text-xs text-slate-600 dark:text-slate-300 mt-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-xl"><b>Competency:</b> ${escapeHtml(dlp.competency)}</p>` : ''}
-              ${fileAttachment}
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white mt-2">${escapeHtml(plan.topic)}</h4>
+              <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">${escapeHtml(plan.subject)}</div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">${escapeHtml(plan.objectives)}</p>
             </div>
 
-            <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
-              <span class="text-[10px] text-slate-400">Created: ${new Date(dlp.createdAt).toLocaleDateString()}</span>
-              <div class="flex items-center gap-1">
-                <button data-delete-dlp="${dlp.id}" class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 rounded-lg">
-                  <i class="ph-bold ph-trash"></i>
-                </button>
+            <div class="pt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-1.5">
+                <button data-dlp-action="edit" data-dlp-id="${plan.id}" class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700" title="Edit Plan"><i class="ph ph-pencil"></i></button>
+                <button data-dlp-action="delete" data-dlp-id="${plan.id}" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40" title="Delete Plan"><i class="ph ph-trash"></i></button>
               </div>
+              <button data-dlp-action="submit" data-dlp-id="${plan.id}" class="px-2.5 py-1 text-xs rounded-lg font-semibold transition ${plan.status === 'Draft' ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-slate-100 text-slate-400 pointer-events-none'}">
+                ${plan.status === 'Draft' ? 'Submit to Principal' : (plan.status === 'Approved' ? 'Signed & Approved' : 'Under Review')}
+              </button>
             </div>
           </div>
         `;
       }).join('');
 
-      container.querySelectorAll('[data-delete-dlp]').forEach(btn => {
-        btn.onclick = () => deleteDlp(btn.dataset.deleteDlp);
+      container.querySelectorAll('[data-dlp-action="edit"]').forEach(btn => {
+        btn.onclick = () => openEditDLPModal(btn.dataset.dlpId);
+      });
+      container.querySelectorAll('[data-dlp-action="delete"]').forEach(btn => {
+        btn.onclick = () => deleteDLP(btn.dataset.dlpId);
+      });
+      container.querySelectorAll('[data-dlp-action="submit"]').forEach(btn => {
+        btn.onclick = async () => {
+          const p = lessonPlans.find(lp => lp.id === btn.dataset.dlpId);
+          if (p) {
+            p.status = 'Submitted';
+            renderTeacherDLP(teacher);
+            await syncToCloud();
+          }
+        };
       });
     }
 
-    // Principal Dashboard
+    function openCreateDLPModal() {
+      const teacher = faculty.find(t => t.id === currentUser.teacherId);
+      document.getElementById('modal-dlp-title').textContent = 'Create Daily Lesson Plan (DLP)';
+      document.getElementById('dlp-id-input').value = '';
+      document.getElementById('dlp-subject-input').value = teacher?.periods?.find(p => p.type === 'class')?.title || 'Science 7';
+      document.getElementById('dlp-date-input').value = new Date().toISOString().split('T')[0];
+      document.getElementById('dlp-topic-input').value = '';
+      document.getElementById('dlp-objectives-input').value = '';
+      document.getElementById('dlp-resources-input').value = '';
+      document.getElementById('dlp-procedure-input').value = '';
+      document.getElementById('dlp-assessment-input').value = '';
+
+      document.getElementById('modal-dlp').classList.remove('hidden');
+    }
+
+    function openEditDLPModal(id) {
+      const plan = lessonPlans.find(lp => lp.id === id);
+      if (!plan) return;
+
+      document.getElementById('modal-dlp-title').textContent = 'Edit Daily Lesson Plan (DLP)';
+      document.getElementById('dlp-id-input').value = plan.id;
+      document.getElementById('dlp-subject-input').value = plan.subject;
+      document.getElementById('dlp-date-input').value = plan.date;
+      document.getElementById('dlp-topic-input').value = plan.topic;
+      document.getElementById('dlp-objectives-input').value = plan.objectives;
+      document.getElementById('dlp-resources-input').value = plan.resources || '';
+      document.getElementById('dlp-procedure-input').value = plan.procedure || '';
+      document.getElementById('dlp-assessment-input').value = plan.assessment || '';
+
+      document.getElementById('modal-dlp').classList.remove('hidden');
+    }
+
+    async function handleDLPSave(e) {
+      e.preventDefault();
+      const id = document.getElementById('dlp-id-input').value;
+      const teacher = faculty.find(t => t.id === currentUser.teacherId);
+
+      const dlpData = {
+        id: id || ('dlp_' + Date.now()),
+        teacherId: currentUser.teacherId,
+        teacherName: teacher?.name || 'Faculty Member',
+        subject: document.getElementById('dlp-subject-input').value.trim(),
+        date: document.getElementById('dlp-date-input').value,
+        topic: document.getElementById('dlp-topic-input').value.trim(),
+        objectives: document.getElementById('dlp-objectives-input').value.trim(),
+        resources: document.getElementById('dlp-resources-input').value.trim(),
+        procedure: document.getElementById('dlp-procedure-input').value.trim(),
+        assessment: document.getElementById('dlp-assessment-input').value.trim(),
+        status: id ? (lessonPlans.find(p => p.id === id)?.status || 'Draft') : 'Draft'
+      };
+
+      if (!id) {
+        lessonPlans.unshift(dlpData);
+      } else {
+        const idx = lessonPlans.findIndex(p => p.id === id);
+        if (idx !== -1) lessonPlans[idx] = dlpData;
+      }
+
+      document.getElementById('modal-dlp').classList.add('hidden');
+      renderTeacherDLP(teacher);
+      await syncToCloud();
+    }
+
+    async function deleteDLP(id) {
+      lessonPlans = lessonPlans.filter(p => p.id !== id);
+      const teacher = faculty.find(t => t.id === currentUser.teacherId);
+      renderTeacherDLP(teacher);
+      await syncToCloud();
+    }
+
+    // ================= PRINCIPAL SUPERVISION SUITE =================
     function renderPrincipalDashboard() {
       const select = document.getElementById('principal-teacher-select');
       select.innerHTML = faculty.map(t => `
@@ -1673,75 +2102,8 @@
       `).join('');
 
       renderPrincipalMonitorGrid();
+      renderPrincipalDLPQueue();
       renderPrincipalSelectedTeacherSchedule();
-      renderPrincipalDlpReviews();
-    }
-
-    function renderPrincipalDlpReviews() {
-      const grid = document.getElementById('principal-dlp-review-grid');
-      const pendingBadge = document.getElementById('principal-dlp-pending-badge');
-      const pendingCount = dlpList.filter(d => !d.approved).length;
-      pendingBadge.textContent = `${pendingCount} Pending Approval`;
-
-      if (dlpList.length === 0) {
-        grid.innerHTML = `<div class="col-span-full p-6 text-center text-xs text-slate-400">No teacher lesson plans submitted yet.</div>`;
-        return;
-      }
-
-      grid.innerHTML = dlpList.map(dlp => {
-        const teacher = faculty.find(t => t.id === dlp.teacherId);
-        const teacherName = teacher ? teacher.name : 'Teacher';
-
-        let docAction = '';
-        if (dlp.docLink) {
-          docAction = `<a href="${escapeHtml(dlp.docLink)}" target="_blank" class="px-2 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-semibold hover:underline">Inspect Google Doc</a>`;
-        } else if (dlp.fileData) {
-          docAction = `<a href="${dlp.fileData}" download="${dlp.fileName || 'Lesson_Plan'}" class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-semibold hover:underline">Download File</a>`;
-        }
-
-        return `
-          <div class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between text-[11px] mb-1.5">
-                <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHtml(teacherName)}</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${dlp.level === 'SHS' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800'}">${dlp.level}</span>
-              </div>
-              <div class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(dlp.title)}</div>
-              <div class="text-[10px] text-slate-500">Target Date: ${escapeHtml(dlp.date)} | ${escapeHtml(dlp.gradeSection || '')}</div>
-              ${dlp.competency ? `<div class="text-[11px] text-slate-600 dark:text-slate-300 mt-1 line-clamp-2 bg-white dark:bg-slate-900 p-1.5 rounded-lg border border-slate-200 dark:border-slate-800">${escapeHtml(dlp.competency)}</div>` : ''}
-            </div>
-
-            <div class="pt-3 mt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2">
-              ${docAction}
-              ${dlp.approved 
-                ? `<span class="text-[11px] font-bold text-emerald-600 flex items-center gap-1"><i class="ph-bold ph-seal-check"></i> Approved</span>`
-                : `<button data-approve-dlp="${dlp.id}" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">Approve & Sign</button>`
-              }
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      grid.querySelectorAll('[data-approve-dlp]').forEach(btn => {
-        btn.onclick = () => approveDlp(btn.dataset.approveDlp);
-      });
-    }
-
-    async function approveDlp(dlpId) {
-      const match = dlpList.find(d => d.id === dlpId);
-      if (match) {
-        match.approved = true;
-        match.approvedAt = new Date().toISOString();
-        renderPrincipalDashboard();
-        await syncToCloud();
-      }
-    }
-
-    async function deleteDlp(dlpId) {
-      if (!confirm("Are you sure you want to remove this Lesson Plan?")) return;
-      dlpList = dlpList.filter(d => d.id !== dlpId);
-      renderApp();
-      await syncToCloud();
     }
 
     function renderPrincipalMonitorGrid() {
@@ -1802,6 +2164,54 @@
       countBadge.textContent = `${activeClassCount}/12 Teachers Currently in Class`;
     }
 
+    function renderPrincipalDLPQueue() {
+      const container = document.getElementById('principal-dlp-queue');
+      if (lessonPlans.length === 0) {
+        container.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">No lesson plans have been created by teachers yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = lessonPlans.map(plan => {
+        let badgeColor = 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300';
+        if (plan.status === 'Approved') badgeColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300';
+        else if (plan.status === 'Draft') badgeColor = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+
+        return `
+          <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 dark:text-white">${escapeHtml(plan.topic)}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}">${plan.status}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
+                <span>By: <b>${escapeHtml(plan.teacherName)}</b></span>
+                <span>•</span>
+                <span>${escapeHtml(plan.subject)}</span>
+                <span>•</span>
+                <span>${plan.date}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 self-end sm:self-auto">
+              <button data-approve-dlp-id="${plan.id}" class="px-3 py-1 text-xs rounded-lg font-semibold transition ${plan.status === 'Approved' ? 'bg-emerald-100 text-emerald-800 cursor-default' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}">
+                ${plan.status === 'Approved' ? '✓ Approved' : 'Sign & Approve'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('[data-approve-dlp-id]').forEach(btn => {
+        btn.onclick = async () => {
+          const p = lessonPlans.find(lp => lp.id === btn.dataset.approveDlpId);
+          if (p && p.status !== 'Approved') {
+            p.status = 'Approved';
+            renderPrincipalDLPQueue();
+            await syncToCloud();
+          }
+        };
+      });
+    }
+
     function inspectTeacherByPrincipal(teacherId) {
       selectedPrincipalTeacherId = teacherId;
       document.getElementById('principal-teacher-select').value = teacherId;
@@ -1838,7 +2248,7 @@
           ${teacher.periods.map((p, idx) => `
             <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 text-xs">
               <div class="flex items-center gap-3">
-                <span class="font-mono font-bold text-slate-600 dark:text-slate-300">${formatTimeMinutes(parseTimeToMinutes(p.start))} -${formatTimeMinutes(parseTimeToMinutes(p.end))}</span>
+                <span class="font-mono font-bold text-slate-600 dark:text-slate-300">${formatTimeMinutes(parseTimeToMinutes(p.start))} - ${formatTimeMinutes(parseTimeToMinutes(p.end))}</span>
                 <span class="font-bold text-slate-900 dark:text-white">${escapeHtml(p.title)}</span>
                 <span class="text-slate-400">(${escapeHtml(p.room || 'Room')})</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full ${p.type === 'class' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-600'}">${p.type}</span>
@@ -1952,7 +2362,6 @@
       await syncToCloud();
     }
 
-    // Profile Modals
     function openEditProfileModal() {
       if (!currentUser || currentUser.role !== 'teacher') return;
       openPrincipalEditTeacherModal(currentUser.teacherId);
@@ -2044,106 +2453,16 @@
       teacher.room = document.getElementById('profile-room-input').value.trim();
       
       const newPin = document.getElementById('profile-pin-input').value.trim();
-      if (newPin) {
-        teacher.pin = newPin;
-      }
+      if (newPin) teacher.pin = newPin;
 
-      if (tempImageBase64 !== null) {
-        teacher.avatar = tempImageBase64;
-      }
+      if (tempImageBase64 !== null) teacher.avatar = tempImageBase64;
 
       closeEditProfileModal();
       renderApp();
       await syncToCloud();
     }
 
-    // DLP Modal Handlers
-    function openDlpModal() {
-      document.getElementById('dlp-id-input').value = '';
-      document.getElementById('dlp-title-input').value = '';
-      document.getElementById('dlp-date-input').value = new Date().toISOString().split('T')[0];
-      document.getElementById('dlp-grade-section').value = '';
-      document.getElementById('dlp-competency').value = '';
-      document.getElementById('dlp-resources').value = '';
-      document.getElementById('dlp-assessment').value = '';
-      document.getElementById('dlp-procedures').value = '';
-      document.getElementById('dlp-link-input').value = '';
-      document.getElementById('dlp-file-input').value = '';
-      document.getElementById('dlp-file-name-label').textContent = '';
-      tempDlpFileBase64 = null;
-      tempDlpFileName = null;
-
-      setDlpMode('form');
-      document.getElementById('modal-dlp').classList.remove('hidden');
-    }
-
-    function closeDlpModal() {
-      document.getElementById('modal-dlp').classList.add('hidden');
-    }
-
-    function setDlpMode(mode) {
-      currentDlpMode = mode;
-      const btnForm = document.getElementById('dlp-mode-btn-form');
-      const btnUpload = document.getElementById('dlp-mode-btn-upload');
-      const formFields = document.getElementById('dlp-interactive-fields');
-      const uploadFields = document.getElementById('dlp-upload-fields');
-
-      if (mode === 'form') {
-        btnForm.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white';
-        btnUpload.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300';
-        formFields.classList.remove('hidden');
-        uploadFields.classList.add('hidden');
-      } else {
-        btnUpload.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white';
-        btnForm.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300';
-        formFields.classList.add('hidden');
-        uploadFields.classList.remove('hidden');
-      }
-    }
-
-    function handleDlpFileUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      tempDlpFileName = file.name;
-      document.getElementById('dlp-file-name-label').textContent = `Attached: ${file.name}`;
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        tempDlpFileBase64 = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function handleDlpSubmit(e) {
-      e.preventDefault();
-      if (!currentUser || currentUser.role !== 'teacher') return;
-
-      const newDlp = {
-        id: 'dlp_' + Date.now(),
-        teacherId: currentUser.teacherId,
-        title: document.getElementById('dlp-title-input').value.trim(),
-        level: document.getElementById('dlp-level-select').value,
-        date: document.getElementById('dlp-date-input').value,
-        gradeSection: document.getElementById('dlp-grade-section').value.trim(),
-        competency: document.getElementById('dlp-competency').value.trim(),
-        resources: document.getElementById('dlp-resources').value.trim(),
-        assessment: document.getElementById('dlp-assessment').value.trim(),
-        procedures: document.getElementById('dlp-procedures').value.trim(),
-        docLink: document.getElementById('dlp-link-input').value.trim(),
-        fileData: tempDlpFileBase64,
-        fileName: tempDlpFileName,
-        approved: false,
-        createdAt: new Date().toISOString()
-      };
-
-      dlpList.unshift(newDlp);
-      closeDlpModal();
-      renderApp();
-      await syncToCloud();
-    }
-
-    // Memo Handlers
+    // Principal Memo
     function openBroadcastMemoModal() {
       document.getElementById('memo-text-input').value = memoText;
       document.getElementById('modal-memo').classList.remove('hidden');
@@ -2203,10 +2522,9 @@
       document.getElementById('modal-credentials').classList.add('hidden');
     }
 
-    // Simulator
+    // Time Simulator
     function toggleSimDrawer() {
-      const drawer = document.getElementById('sim-drawer');
-      drawer.classList.toggle('hidden');
+      document.getElementById('sim-drawer').classList.toggle('hidden');
     }
 
     function applySimulation() {
@@ -2253,13 +2571,13 @@
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Bind DOM events
+    // Bind DOM Events
     document.addEventListener('DOMContentLoaded', () => {
       renderApp();
       updateNavClock();
       setupFirebaseSync();
 
-      // UI Controls
+      // Form & Top Nav
       document.getElementById('login-form').onsubmit = handleLoginSubmit;
       document.getElementById('btn-forgot-pin').onclick = openCredentialsModal;
       document.getElementById('btn-open-credentials').onclick = openCredentialsModal;
@@ -2267,23 +2585,34 @@
       document.getElementById('btn-close-credentials-footer').onclick = closeCredentialsModal;
       document.getElementById('btn-quick-login-principal').onclick = () => quickLogin('principal');
 
+      // Simulator
       document.getElementById('btn-toggle-sim').onclick = toggleSimDrawer;
       document.getElementById('btn-apply-sim').onclick = applySimulation;
       document.getElementById('btn-reset-sim').onclick = resetSimulation;
 
-      // Suite Tab Switching
-      document.getElementById('suite-tab-timetable').onclick = () => {
-        activeSuiteTab = 'timetable';
-        renderTeacherDashboard();
+      // Suite Module Tabs
+      document.getElementById('suite-tab-schedule').onclick = () => {
+        currentModule = 'schedule';
+        renderApp();
+      };
+      document.getElementById('suite-tab-attendance').onclick = () => {
+        currentModule = 'attendance';
+        renderApp();
+      };
+      document.getElementById('suite-tab-grades').onclick = () => {
+        currentModule = 'grades';
+        renderApp();
       };
       document.getElementById('suite-tab-dlp').onclick = () => {
-        activeSuiteTab = 'dlp';
-        renderTeacherDashboard();
+        currentModule = 'dlp';
+        renderApp();
       };
 
+      // Schedule Sub-tabs
       document.getElementById('tab-btn-timeline').onclick = () => setTeacherViewTab('timeline');
       document.getElementById('tab-btn-weekly').onclick = () => setTeacherViewTab('weekly');
 
+      // Profile & Periods
       document.getElementById('btn-open-edit-profile').onclick = openEditProfileModal;
       document.getElementById('btn-teacher-photo-shortcut').onclick = openEditProfileModal;
       document.getElementById('btn-close-edit-profile').onclick = closeEditProfileModal;
@@ -2297,15 +2626,13 @@
       document.getElementById('btn-cancel-period-modal').onclick = closePeriodModal;
       document.getElementById('period-form').onsubmit = handlePeriodSave;
 
-      // DLP Mode Switchers
-      document.getElementById('btn-open-new-dlp').onclick = openDlpModal;
-      document.getElementById('btn-close-dlp-modal').onclick = closeDlpModal;
-      document.getElementById('btn-cancel-dlp-modal').onclick = closeDlpModal;
-      document.getElementById('dlp-mode-btn-form').onclick = () => setDlpMode('form');
-      document.getElementById('dlp-mode-btn-upload').onclick = () => setDlpMode('upload');
-      document.getElementById('dlp-file-input').onchange = handleDlpFileUpload;
-      document.getElementById('dlp-form').onsubmit = handleDlpSubmit;
+      // DLP Modals
+      document.getElementById('btn-create-dlp').onclick = openCreateDLPModal;
+      document.getElementById('btn-close-dlp-modal').onclick = () => document.getElementById('modal-dlp').classList.add('hidden');
+      document.getElementById('btn-cancel-dlp-modal').onclick = () => document.getElementById('modal-dlp').classList.add('hidden');
+      document.getElementById('dlp-form').onsubmit = handleDLPSave;
 
+      // Principal Controls
       document.getElementById('btn-open-memo').onclick = openBroadcastMemoModal;
       document.getElementById('btn-close-memo-modal').onclick = closeBroadcastMemoModal;
       document.getElementById('btn-cancel-memo').onclick = closeBroadcastMemoModal;
