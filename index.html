@@ -555,11 +555,6 @@
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    /* 
-      FIREBASE CONFIGURATION
-      If deploying on GitHub Pages, replace this config with your own Firebase project settings from:
-      Firebase Console (https://console.firebase.google.com/) -> Project Settings -> General -> Your apps -> Web app
-    */
     const defaultFirebaseConfig = {
       apiKey: "AIzaSyCclha1GUlmyQAxqYqhG-PjqscsqhIndpc",
       authDomain: "super-duper-garbanzo2.firebaseapp.com",
@@ -839,7 +834,6 @@
       }
     ];
 
-    // Master Principal Account Default
     const DEFAULT_PRINCIPAL_USER = {
       role: 'principal',
       username: 'principal',
@@ -852,7 +846,7 @@
     let faculty = JSON.parse(JSON.stringify(DEFAULT_FACULTY));
     let principalPin = '1234';
     let memoText = "Welcome to the School Year! Teachers may inspect and manage their individual timetable below.";
-    let currentUser = null; // null, { role: 'principal' }, or { role: 'teacher', teacherId: 'borla' }
+    let currentUser = null; 
     let teacherActiveTab = 'timeline';
     let isSimulated = false;
     let simDay = 5;
@@ -860,13 +854,34 @@
     let selectedPrincipalTeacherId = 'borla';
     let tempImageBase64 = null;
 
-    // Local session restore for active tab
+    // Restore local session if exists
     const savedUser = sessionStorage.getItem('school_auth_session');
     if (savedUser) {
       try { currentUser = JSON.parse(savedUser); } catch (e) { currentUser = null; }
     }
 
-    function updateSyncIndicator(status, text) {
+    // LocalStorage fallback cache
+    function loadLocalCache() {
+      const saved = localStorage.getItem('school_timetable_cache_v5');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.faculty) faculty = parsed.faculty;
+          if (parsed.principalPin) principalPin = parsed.principalPin;
+          if (parsed.memoText !== undefined) memoText = parsed.memoText;
+        } catch (e) {}
+      }
+    }
+
+    function saveLocalCache() {
+      localStorage.setItem('school_timetable_cache_v5', JSON.stringify({
+        faculty,
+        principalPin,
+        memoText
+      }));
+    }
+
+    function updateSyncIndicator(status) {
       const el = document.getElementById('cloud-sync-status');
       if (!el) return;
       if (status === 'connected') {
@@ -881,9 +896,10 @@
       }
     }
 
-    // Save full data payload to Firestore cloud document
+    // Single unified sync function: Always writes to the EXACT document the listener reads
     async function syncToCloud() {
-      if (!isCloudReady || !currentUserFirebase || !db) return;
+      saveLocalCache();
+      if (!isCloudReady || !db) return;
       updateSyncIndicator('syncing');
       try {
         const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'timetable', 'master');
@@ -891,8 +907,7 @@
           faculty: JSON.stringify(faculty),
           principalPin: principalPin,
           memoText: memoText,
-          lastUpdated: new Date().toISOString(),
-          updatedBy: currentUser?.role || 'system'
+          lastUpdated: new Date().toISOString()
         }, { merge: true });
         updateSyncIndicator('connected');
       } catch (err) {
@@ -911,6 +926,9 @@
 
     // Initialize Firebase and Real-Time Listener
     async function setupFirebaseSync() {
+      loadLocalCache();
+      renderApp();
+
       try {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
@@ -931,24 +949,36 @@
         isCloudReady = true;
         updateSyncIndicator('connected');
 
-        // Listen for real-time changes across all teacher devices
+        // Master cloud document listener
         const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'timetable', 'master');
         onSnapshot(publicDocRef, (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data();
             if (data.faculty) {
-              try { faculty = JSON.parse(data.faculty); } catch (e) { console.error(e); }
+              try {
+                const cloudFaculty = JSON.parse(data.faculty);
+                // Merge cloud data with DEFAULT_FACULTY, always giving priority to cloud edits & custom photos
+                faculty = DEFAULT_FACULTY.map(def => {
+                  const match = cloudFaculty.find(cf => cf.id === def.id);
+                  if (match) {
+                    return {
+                      ...def,
+                      ...match,
+                      avatar: (match.avatar && match.avatar !== '') ? match.avatar : def.avatar
+                    };
+                  }
+                  return def;
+                });
+              } catch (e) { console.error(e); }
             }
-            if (data.principalPin) {
-              principalPin = data.principalPin;
-            }
-            if (data.memoText !== undefined) {
-              memoText = data.memoText;
-            }
+            if (data.principalPin) principalPin = data.principalPin;
+            if (data.memoText !== undefined) memoText = data.memoText;
+            
+            saveLocalCache();
             updateSyncIndicator('connected');
             renderApp();
           } else {
-            // First time setup on cloud: Seed document with the 12 default teachers
+            // First time setup on Firestore: seed it
             syncToCloud();
           }
         }, (error) => {
@@ -957,7 +987,7 @@
         });
 
       } catch (err) {
-        console.warn("Cloud connection not configured or offline. Operating in self-contained local mode.", err);
+        console.warn("Cloud connection error, operating in offline cache mode.", err);
         updateSyncIndicator('offline');
       }
     }
@@ -1020,7 +1050,7 @@
       const pinInput = document.getElementById('login-pin').value.trim();
       const errorBox = document.getElementById('login-error');
 
-      // Check if Principal
+      // Check Principal
       if (usernameInput === DEFAULT_PRINCIPAL_USER.username) {
         if (pinInput === principalPin) {
           currentUser = { role: 'principal' };
@@ -1503,7 +1533,7 @@
           ${teacher.periods.map((p, idx) => `
             <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 text-xs">
               <div class="flex items-center gap-3">
-                <span class="font-mono font-bold text-slate-600 dark:text-slate-300">${formatTimeMinutes(parseTimeToMinutes(p.start))} - ${formatTimeMinutes(parseTimeToMinutes(p.end))}</span>
+                <span class="font-mono font-bold text-slate-600 dark:text-slate-300">${formatTimeMinutes(parseTimeToMinutes(p.start))} -${formatTimeMinutes(parseTimeToMinutes(p.end))}</span>
                 <span class="font-bold text-slate-900 dark:text-white">${escapeHtml(p.title)}</span>
                 <span class="text-slate-400">(${escapeHtml(p.room || 'Room')})</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full ${p.type === 'class' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-600'}">${p.type}</span>
@@ -1629,13 +1659,13 @@
       const teacher = faculty.find(t => t.id === teacherId);
       if (!teacher) return;
 
-      tempImageBase64 = teacher.avatar || null;
+      tempImageBase64 = null;
       document.getElementById('profile-name-input').value = teacher.name;
       document.getElementById('profile-dept-input').value = teacher.dept;
       document.getElementById('profile-room-input').value = teacher.room || '';
       document.getElementById('profile-pin-input').value = '';
 
-      updateProfilePreviewAvatar(teacher.name, tempImageBase64);
+      updateProfilePreviewAvatar(teacher.name, teacher.avatar);
       document.getElementById('edit-profile-form').dataset.teacherId = teacherId;
       document.getElementById('modal-edit-profile').classList.remove('hidden');
     }
@@ -1665,7 +1695,7 @@
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
-          const maxDim = 280; // Compressed to keep Cloud Document size optimized
+          const maxDim = 200; // Perfect profile avatar dimensions
           let width = img.width;
           let height = img.height;
 
@@ -1685,7 +1715,9 @@
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          tempImageBase64 = canvas.toDataURL('image/jpeg', 0.82);
+          
+          // Ultra-optimized quality keeps file size small for Firestore
+          tempImageBase64 = canvas.toDataURL('image/jpeg', 0.65);
           updateProfilePreviewAvatar(document.getElementById('profile-name-input').value, tempImageBase64);
         };
         img.src = evt.target.result;
@@ -1714,12 +1746,15 @@
         teacher.pin = newPin;
       }
 
+      // If user selected a new photo or cleared it, update it
       if (tempImageBase64 !== null) {
         teacher.avatar = tempImageBase64;
       }
 
       closeEditProfileModal();
       renderApp();
+      
+      // Save directly to Firestore cloud master document
       await syncToCloud();
     }
 
